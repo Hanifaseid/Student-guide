@@ -43,7 +43,7 @@ const StudyPlanner = ({ darkMode }) => {
                 type="checkbox"
                 checked={task.completed}
                 onChange={() => toggleTask(task.id)}
-                className="mr-3 h-5 w-5"
+                className="mr-3 cursor-pointer h-5 w-5"
               />
               <div className="flex-1">
                 <p className={`${task.completed ? 'line-through opacity-70' : ''}`}>{task.text}</p>
@@ -76,18 +76,36 @@ const StudyPlanner = ({ darkMode }) => {
             placeholder="Subject"
             className={`w-full p-2 rounded ${darkMode ? 'bg-gray-600 text-white' : 'bg-white'}`}
           />
+          <div className="relative w-full">
           <select
             value={newTask.priority}
-            onChange={(e) => setNewTask({...newTask, priority: e.target.value})}
-            className={`w-full p-2 rounded ${darkMode ? 'bg-gray-600 text-white' : 'bg-white'}`}
+            onChange={(e) => setNewTask({ ...newTask, priority: e.target.value })}
+            className={`w-full appearance-none p-2 pr-10 cursor-pointer rounded ${darkMode ? 'bg-gray-600 text-white' : 'bg-white text-black'}`}
           >
             <option value="high">High Priority</option>
             <option value="medium">Medium Priority</option>
             <option value="low">Low Priority</option>
           </select>
+
+          {/* Custom dropdown icon */}
+          <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center">
+            <svg
+              className={`w-4 h-4 ${darkMode ? 'text-white' : 'text-black'}`}
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              <path
+                fillRule="evenodd"
+                d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.25a.75.75 0 01-1.06 0L5.21 8.27a.75.75 0 01.02-1.06z"
+                clipRule="evenodd"
+              />
+            </svg>
+          </div>
+        </div>
+
           <button
             onClick={addTask}
-            className={`px-4 py-2 rounded ${darkMode ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'} text-white`}
+            className={`px-4 py-2 cursor-pointer rounded ${darkMode ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'} text-white`}
           >
             Add Task
           </button>
