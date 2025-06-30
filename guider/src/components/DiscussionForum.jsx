@@ -220,7 +220,7 @@ const DiscussionForum = ({ darkMode }) => {
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
                       placeholder="Search topics..."
-                      className={`w-full pl-10 pr-4 py-2.5 rounded-lg border ${darkMode ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' : 'bg-white border-gray-300 placeholder-gray-500'}`}
+                      className={`w-full pl-10 pr-4 py-2.5 cursor-pointer rounded-lg border ${darkMode ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' : 'bg-white border-gray-300 placeholder-gray-500'}`}
                     />
                   </div>
                   <div className="flex gap-2">
@@ -297,7 +297,7 @@ const DiscussionForum = ({ darkMode }) => {
                                 e.stopPropagation();
                                 upvoteTopic(topic.id);
                               }}
-                              className={`flex flex-col items-center p-2 rounded-full transition-colors ${darkMode ? 'hover:bg-gray-600' : 'hover:bg-gray-200'}`}
+                              className={`flex flex-col cursor-pointer items-center p-2 rounded-full transition-colors ${darkMode ? 'hover:bg-gray-600' : 'hover:bg-gray-200'}`}
                             >
                               <FiThumbsUp className={darkMode ? 'text-blue-400' : 'text-blue-500'} />
                               <span className="text-xs mt-1">{topic.upvotes}</span>
@@ -352,7 +352,7 @@ const DiscussionForum = ({ darkMode }) => {
                       value={newTopic.title}
                       onChange={(e) => setNewTopic({...newTopic, title: e.target.value})}
                       placeholder="Enter topic title"
-                      className={`w-full p-2.5 rounded-lg border ${darkMode ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' : 'bg-white border-gray-300 placeholder-gray-500'}`}
+                      className={`w-full p-2.5 cursor-pointer rounded-lg border ${darkMode ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' : 'bg-white border-gray-300 placeholder-gray-500'}`}
                     />
                   </div>
                   
@@ -392,56 +392,55 @@ const DiscussionForum = ({ darkMode }) => {
                     </div>
                   )}
                   
-                  <div>
-                    <label className={`block text-sm mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                      Tags
-                    </label>
-                    <div className={`p-2 rounded-lg border ${darkMode ? 'bg-gray-700 border-gray-600' : 'bg-white border-gray-300'}`}>
-                      <div className="flex flex-wrap gap-2 mb-2">
-                        {newTopic.tags.map((tag, index) => (
-                          <span 
-                            key={index} 
-                            className={`px-2.5 py-1 rounded-full text-xs flex items-center ${darkMode ? 'bg-gray-600 text-gray-200' : 'bg-gray-200 text-gray-700'}`}
-                          >
-                            #{tag}
-                            <button 
-                              onClick={() => removeTag(tag)}
-                              className="ml-1.5 text-xs hover:text-red-400"
-                            >
-                              <FiX size={12} />
-                            </button>
-                          </span>
-                        ))}
-                      </div>
-                      {showTagInput ? (
-                        <div className="flex gap-2">
-                          <input
-                            type="text"
-                            value={newTag}
-                            onChange={(e) => setNewTag(e.target.value)}
-                            placeholder="Add tag..."
-                            className={`flex-grow p-2 rounded-lg border ${darkMode ? 'bg-gray-600 border-gray-500 text-white' : 'bg-white border-gray-300'}`}
-                            onKeyPress={(e) => e.key === 'Enter' && addTag()}
-                            autoFocus
-                          />
-                          <button
-                            onClick={addTag}
-                            className={`px-3 rounded-lg flex items-center ${darkMode ? 'bg-gray-600 hover:bg-gray-500' : 'bg-gray-200 hover:bg-gray-300'}`}
-                          >
-                            Add
-                          </button>
-                        </div>
-                      ) : (
-                        <button
-                          onClick={() => setShowTagInput(true)}
-                          className={`text-sm flex items-center ${darkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-800'}`}
-                        >
-                          <FiPlus className="mr-1" />
-                          Add tag
-                        </button>
-                      )}
-                    </div>
-                  </div>
+                 <div>
+  <label className={`block text-sm mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+    Tags
+  </label>
+  <div className={`p-2 rounded-lg border ${darkMode ? 'bg-gray-700 border-gray-600' : 'bg-white border-gray-300'}`}>
+    <div className="flex flex-wrap gap-2 mb-2 min-h-[40px]">
+      {newTopic.tags.map((tag, index) => (
+        <div 
+          key={index} 
+          className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs ${darkMode ? 'bg-gray-600 text-gray-200' : 'bg-gray-200 text-gray-700'}`}
+        >
+          #{tag}
+          <button 
+            onClick={() => removeTag(tag)}
+            className="ml-1.5 cursor-pointer hover:text-red-400"
+            type="button"
+          >
+            <FiX size={12} />
+          </button>
+        </div>
+      ))}
+    </div>
+
+    {showTagInput ? (
+      <div className="flex items-center gap-2">
+        <input
+          type="text"
+          value={newTag}
+          onChange={(e) => setNewTag(e.target.value)}
+          placeholder="Add tag..."
+          className={`flex-grow p-2 w-full h-full box-border overflow-hiddenrounded-lg border
+          ${darkMode ? 'bg-gray-600 border-gray-500 text-white' : 'bg-white border-gray-300'}`}
+          onKeyPress={(e) => e.key === 'Enter' && addTag()}
+          autoFocus
+        />
+       
+      </div>
+    ) : (
+      <button
+        onClick={() => setShowTagInput(true)}
+        className={`text-sm cursor-pointer flex items-center ${darkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-800'}`}
+        type="button"
+      >
+        <FiPlus className="mr-1" />
+        Add tag
+      </button>
+    )}
+  </div>
+</div>
                   
                   <div>
                     <label className={`block text-sm mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
@@ -451,22 +450,23 @@ const DiscussionForum = ({ darkMode }) => {
                       value={newTopic.content}
                       onChange={(e) => setNewTopic({...newTopic, content: e.target.value})}
                       placeholder="Your question or discussion topic (markdown supported)"
-                      className={`w-full p-2.5 rounded-lg border ${darkMode ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' : 'bg-white border-gray-300 placeholder-gray-500'}`}
+                      className={`w-full p-2.5 cursor-pointer rounded-lg border ${darkMode ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' : 'bg-white border-gray-300 placeholder-gray-500'}`}
                       rows="5"
                     />
                   </div>
                   
-                  <button
-                    onClick={addTopic}
-                    disabled={!newTopic.title || !newTopic.subject || !newTopic.content}
-                    className={`w-full py-2.5 rounded-lg font-medium transition-all ${
-                      (!newTopic.title || !newTopic.subject || !newTopic.content) ? 
-                      (darkMode ? 'bg-gray-600 cursor-not-allowed' : 'bg-gray-300 cursor-not-allowed') : 
-                      (darkMode ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600')
-                    } text-white shadow-md`}
-                  >
-                    Post Topic
-                  </button>
+                <button
+                  onClick={addTopic}
+                  disabled={!newTopic.title || !newTopic.subject || !newTopic.content}
+                  className={`w-full py-2.5 cursor-pointer rounded-lg font-bolder bg-gray-500 hover:bg-gray-600 text-lg transition-all ${
+                    (!newTopic.title || !newTopic.subject || !newTopic.content)
+                      ? (darkMode ? 'bg-gray-600 cursor-not-allowed' : 'bg-gray-300 cursor-not-allowed')
+                      : (darkMode ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600')
+                  } text-white shadow-md`}
+                >
+                  Post Topic
+                </button>
+
                 </div>
               </div>
 
@@ -490,7 +490,7 @@ const DiscussionForum = ({ darkMode }) => {
           <div className="max-w-4xl mx-auto">
             <button
               onClick={() => setActiveTopic(null)}
-              className={`mb-6 px-4 py-2 rounded-lg flex items-center transition-colors ${darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'} shadow-sm`}
+              className={`mb-6 px-4 py-2 rounded-lg cursor-pointer flex items-center transition-colors ${darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'} shadow-sm`}
             >
               <FiArrowLeft className="mr-2" />
               Back to topics
@@ -513,10 +513,10 @@ const DiscussionForum = ({ darkMode }) => {
                 </div>
                 <button
                   onClick={() => upvoteTopic(activeTopic.id)}
-                  className={`flex flex-col items-center p-2 rounded-full transition-colors ${darkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-200'}`}
+                  className={`flex flex-col items-center p-2 rounded-full cursor-pointer transition-colors ${darkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-200'}`}
                 >
                   <FiThumbsUp size={20} className={darkMode ? 'text-blue-400' : 'text-blue-500'} />
-                  <span className="text-sm mt-1">{activeTopic.upvotes}</span>
+                  <span className="text-sm cursor-pointer mt-1">{activeTopic.upvotes}</span>
                 </button>
               </div>
               
@@ -574,7 +574,7 @@ const DiscussionForum = ({ darkMode }) => {
                         </div>
                         <button
                           onClick={() => upvoteReply(activeTopic.id, reply.id)}
-                          className={`flex items-center gap-1 px-2 py-1 rounded transition-colors ${darkMode ? 'hover:bg-gray-600' : 'hover:bg-gray-200'}`}
+                          className={`flex items-center cursor-pointer gap-1 px-2 py-1 rounded transition-colors ${darkMode ? 'hover:bg-gray-600' : 'hover:bg-gray-200'}`}
                         >
                           <FiThumbsUp size={16} className={darkMode ? 'text-blue-400' : 'text-blue-500'} />
                           <span className="text-sm">{reply.upvotes}</span>
@@ -587,7 +587,7 @@ const DiscussionForum = ({ darkMode }) => {
                         {reply.content.length > 200 && (
                           <button
                             onClick={() => toggleReplyExpansion(reply.id)}
-                            className={`text-sm mt-1 flex items-center ${darkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-800'}`}
+                            className={`text-sm cursor-pointer mt-1 flex items-center ${darkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-800'}`}
                           >
                             {expandedReplies[reply.id] ? (
                               <>
@@ -634,7 +634,7 @@ const DiscussionForum = ({ darkMode }) => {
                   <button
                     onClick={addReply}
                     disabled={!newReply.content || newReply.topicId !== activeTopic.id}
-                    className={`px-6 py-2.5 rounded-lg font-medium shadow-md ${
+                    className={`px-6 py-2.5 cursor-pointer rounded-lg font-medium shadow-md ${
                       (!newReply.content || newReply.topicId !== activeTopic.id) ? 
                       (darkMode ? 'bg-gray-600 cursor-not-allowed' : 'bg-gray-300 cursor-not-allowed') : 
                       (darkMode ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600')
@@ -652,7 +652,7 @@ const DiscussionForum = ({ darkMode }) => {
       {isScrolled && (
         <button
           onClick={scrollToTop}
-          className={`fixed bottom-6 right-6 p-3 rounded-full shadow-lg transition-all ${darkMode ? 'bg-gray-700 hover:bg-gray-600 text-blue-400' : 'bg-white hover:bg-gray-100 text-blue-600'}`}
+          className={`fixed bottom-6 right-6 p-3 cursor-pointer rounded-full shadow-lg transition-all ${darkMode ? 'bg-gray-700 hover:bg-gray-600 text-blue-400' : 'bg-white hover:bg-gray-100 text-blue-600'}`}
         >
           ↑
         </button>
