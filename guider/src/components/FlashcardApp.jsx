@@ -115,7 +115,7 @@ const FlashcardApp = ({ darkMode }) => {
           <div className="flex justify-between items-center mb-6">
             <button
               onClick={endStudyMode}
-              className={`px-4 py-2 rounded-lg flex items-center ${darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'} transition-colors`}
+              className={`px-4 py-2 cursor-pointer rounded-lg flex items-center ${darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'} transition-colors`}
             >
               <FiX className="mr-2" /> Exit Study Mode
             </button>
@@ -138,14 +138,14 @@ const FlashcardApp = ({ darkMode }) => {
               <div className="flex justify-between mt-6">
                 <button
                   onClick={prevCard}
-                  className={`px-4 py-2 rounded-lg ${darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'}`}
+                  className={`px-4 py-2 cursor-pointer rounded-lg ${darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'}`}
                 >
                   Previous
                 </button>
                 <div className="difficulty-buttons space-x-2">
                   <button
                     onClick={() => markDifficulty('easy')}
-                    className="px-4 py-2 rounded-lg bg-green-500 hover:bg-green-600 text-white"
+                    className="px-4 py-2 cursor-pointer rounded-lg bg-green-500 hover:bg-green-600 text-white"
                   >
                     Easy
                   </button>
@@ -157,14 +157,14 @@ const FlashcardApp = ({ darkMode }) => {
                   </button>
                   <button
                     onClick={() => markDifficulty('hard')}
-                    className="px-4 py-2 rounded-lg bg-red-500 hover:bg-red-600 text-white"
+                    className="px-4 py-2 cursor-pointer rounded-lg bg-red-500 hover:bg-red-600 text-white"
                   >
                     Hard
                   </button>
                 </div>
                 <button
                   onClick={nextCard}
-                  className={`px-4 py-2 rounded-lg ${darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'}`}
+                  className={`px-4 py-2 cursor-pointer rounded-lg ${darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'}`}
                 >
                   Next
                 </button>
@@ -175,7 +175,7 @@ const FlashcardApp = ({ darkMode }) => {
               <p className="text-lg">No cards to study with current filters.</p>
               <button
                 onClick={endStudyMode}
-                className={`mt-4 px-4 py-2 rounded-lg ${darkMode ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'} text-white`}
+                className={`mt-4 px-4 py-2 cursor-pointer rounded-lg ${darkMode ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'} text-white`}
               >
                 Back to Flashcards
               </button>
@@ -192,26 +192,26 @@ const FlashcardApp = ({ darkMode }) => {
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   placeholder="Search flashcards..."
-                  className={`w-full p-3 rounded-lg ${darkMode ? 'bg-gray-700 text-white' : 'bg-white'} shadow-sm`}
+                  className={`w-full p-3 cursor-pointer rounded-lg ${darkMode ? 'bg-gray-700 text-white' : 'bg-white'} shadow-sm`}
                 />
               </div>
               
               <div className="tabs flex space-x-2">
                 <button
                   onClick={() => setActiveTab('all')}
-                  className={`px-4 py-2 rounded-lg ${activeTab === 'all' ? (darkMode ? 'bg-blue-600' : 'bg-blue-500 text-white') : (darkMode ? 'bg-gray-700' : 'bg-gray-200')}`}
+                  className={`px-4 py-2 cursor-pointer rounded-lg ${activeTab === 'all' ? (darkMode ? 'bg-blue-600' : 'bg-blue-500 text-white') : (darkMode ? 'bg-gray-700' : 'bg-gray-200')}`}
                 >
                   All
                 </button>
                 <button
                   onClick={() => setActiveTab('unreviewed')}
-                  className={`px-4 py-2 rounded-lg ${activeTab === 'unreviewed' ? (darkMode ? 'bg-blue-600' : 'bg-blue-500 text-white') : (darkMode ? 'bg-gray-700' : 'bg-gray-200')}`}
+                  className={`px-4 py-2 cursor-pointer rounded-lg ${activeTab === 'unreviewed' ? (darkMode ? 'bg-blue-600' : 'bg-blue-500 text-white') : (darkMode ? 'bg-gray-700' : 'bg-gray-200')}`}
                 >
                   Unreviewed
                 </button>
                 <button
                   onClick={() => setActiveTab('difficult')}
-                  className={`px-4 py-2 rounded-lg ${activeTab === 'difficult' ? (darkMode ? 'bg-blue-600' : 'bg-blue-500 text-white') : (darkMode ? 'bg-gray-700' : 'bg-gray-200')}`}
+                  className={`px-4 py-2 cursor-pointer rounded-lg ${activeTab === 'difficult' ? (darkMode ? 'bg-blue-600' : 'bg-blue-500 text-white') : (darkMode ? 'bg-gray-700' : 'bg-gray-200')}`}
                 >
                   Difficult
                 </button>
@@ -220,7 +220,7 @@ const FlashcardApp = ({ darkMode }) => {
               <button
                 onClick={startStudyMode}
                 disabled={filteredCards.length === 0}
-                className={`px-4 py-2 rounded-lg flex items-center ${filteredCards.length === 0 ? 'opacity-50 cursor-not-allowed' : ''} ${darkMode ? 'bg-purple-600 hover:bg-purple-700' : 'bg-purple-500 hover:bg-purple-600'} text-white`}
+                className={`px-4 py-2 cursor-pointer rounded-lg flex items-center ${filteredCards.length === 0 ? 'opacity-50 cursor-not-allowed' : ''} ${darkMode ? 'bg-purple-600 hover:bg-purple-700' : 'bg-purple-500 hover:bg-purple-600'} text-white`}
               >
                 <FiRotateCw className="mr-2" /> Study Mode
               </button>
@@ -233,7 +233,7 @@ const FlashcardApp = ({ darkMode }) => {
               {searchTerm && (
                 <button
                   onClick={() => setSearchTerm('')}
-                  className={`px-4 py-2 rounded-lg ${darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'}`}
+                  className={`px-4 py-2 cursor-pointer rounded-lg ${darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'}`}
                 >
                   Clear search
                 </button>
@@ -263,13 +263,13 @@ const FlashcardApp = ({ darkMode }) => {
                       <div className="flex justify-end space-x-2">
                         <button
                           onClick={cancelEdit}
-                          className={`px-3 py-1 rounded ${darkMode ? 'bg-gray-600 hover:bg-gray-500' : 'bg-gray-200 hover:bg-gray-300'}`}
+                          className={`px-3 py-1 cursor-pointer rounded ${darkMode ? 'bg-gray-600 hover:bg-gray-500' : 'bg-gray-200 hover:bg-gray-300'}`}
                         >
                           Cancel
                         </button>
                         <button
                           onClick={saveEdit}
-                          className={`px-3 py-1 rounded ${darkMode ? 'bg-blue-600 hover:bg-blue-500' : 'bg-blue-500 hover:bg-blue-600'} text-white`}
+                          className={`px-3 cursor-pointer py-1 rounded ${darkMode ? 'bg-blue-600 hover:bg-blue-500' : 'bg-blue-500 hover:bg-blue-600'} text-white`}
                         >
                           Save
                         </button>
@@ -286,13 +286,13 @@ const FlashcardApp = ({ darkMode }) => {
                       <div className="absolute top-2 right-2 flex space-x-1">
                         <button
                           onClick={(e) => { e.stopPropagation(); startEditing(card); }}
-                          className={`p-2 rounded-full ${darkMode ? 'bg-gray-600 hover:bg-gray-500' : 'bg-gray-200 hover:bg-gray-300'}`}
+                          className={`p-2 cursor-pointer rounded-full ${darkMode ? 'bg-gray-600 hover:bg-gray-500' : 'bg-gray-200 hover:bg-gray-300'}`}
                         >
                           <FiEdit2 size={16} />
                         </button>
                         <button
                           onClick={(e) => { e.stopPropagation(); deleteCard(card.id); }}
-                          className={`p-2 rounded-full ${darkMode ? 'bg-gray-600 hover:bg-gray-500' : 'bg-gray-200 hover:bg-gray-300'} text-red-500`}
+                          className={`p-2 cursor-pointer rounded-full ${darkMode ? 'bg-gray-600 hover:bg-gray-500' : 'bg-gray-200 hover:bg-gray-300'} text-red-500`}
                         >
                           <FiTrash2 size={16} />
                         </button>
@@ -340,7 +340,7 @@ const FlashcardApp = ({ darkMode }) => {
               <button
                 onClick={addCard}
                 disabled={!newCard.front.trim() || !newCard.back.trim()}
-                className={`px-4 py-2 rounded-lg flex items-center justify-center ${!newCard.front.trim() || !newCard.back.trim() ? 'opacity-50 cursor-not-allowed' : ''} ${darkMode ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'} text-white`}
+                className={`px-4 py-2 rounded-lg cursor-pointer flex items-center justify-center ${!newCard.front.trim() || !newCard.back.trim() ? 'opacity-50 cursor-not-allowed' : ''} ${darkMode ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'} text-white`}
               >
                 <FiPlus className="mr-2" /> Add Card
               </button>
