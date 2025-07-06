@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   FiHome,
   FiBook,
@@ -17,8 +17,9 @@ import {
   FiLayers
 } from 'react-icons/fi';
 
-const Sidebar = ({ darkMode, toggleDarkMode, setActiveComponent }) => {
+const Sidebar = ({ darkMode = true, toggleDarkMode, setActiveComponent }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const [activeItem, setActiveItem] = useState('FlashcardApp');
 
   const menuItems = [
@@ -34,32 +35,66 @@ const Sidebar = ({ darkMode, toggleDarkMode, setActiveComponent }) => {
     { name: 'ExamCountdown', label: 'Exam Countdown', icon: <FiClock size={18} /> },
   ];
 
+  useEffect(() => {
+    const handleResize = () => {
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
+      if (mobile) {
+        setIsCollapsed(true);
+      } else {
+        setIsCollapsed(false);
+      }
+    };
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   const handleItemClick = (name) => {
     setActiveItem(name);
     setActiveComponent(name);
+    if (isMobile) {
+      setIsCollapsed(true);
+    }
   };
 
-  return (
-    <div className="flex h-screen">
+    return (
+    <div className="flex h-screen overflow-hidden">
+      {/* Mobile Navbar - Only shown when on mobile */}
+      {isMobile && (
+        <div className={`fixed top-0 left-0 right-0 flex items-center p-4 shadow-sm z-20 ${darkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-800'}`}>
+          <button
+            onClick={() => setIsCollapsed(!isCollapsed)}
+            className={`p-2 cursor-pointer rounded-full ${darkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100'}`}
+          >
+            <FiMenu size={20} />
+          </button>
+          <h1 className="text-xl font-bold ml-4">Student Learning</h1>
+        </div>
+      )}
+
       {/* Sidebar */}
       <div
-        className={`${darkMode ? 'bg-gray-800' : 'bg-white'} shadow-lg transition-all duration-300 ease-in-out ${
-          isCollapsed ? 'w-20' : 'w-64'
-        }`}
+        className={`${darkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-800'} shadow-lg transition-all duration-300 ease-in-out ${
+          isCollapsed ? 'w-16 md:w-20' : 'w-64'
+        } ${isMobile ? 'fixed h-full z-10' : 'relative'} ${isMobile && isCollapsed ? 'hidden' : ''}`}
       >
         <div className="flex flex-col h-full">
-          {/* Sidebar Header */}
-          <div className={`flex items-center ${isCollapsed ? 'justify-center p-4' : 'justify-between p-4'}`}>
-            {!isCollapsed && (
-              <h1 className={`text-xl font-bold ${darkMode ? 'text-white' : 'text-gray-800'}`}>Student Learning</h1>
-            )}
-            <button
-              onClick={() => setIsCollapsed(!isCollapsed)}
-              className={`p-2 cursor-pointer rounded-full ${darkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100'}`}
-            >
-              {isCollapsed ? <FiMenu size={20} /> : <FiX size={20} />}
-            </button>
-          </div>
+          {/* Sidebar Header - Hidden on mobile */}
+          {!isMobile && (
+            <div className={`flex items-center ${isCollapsed ? 'justify-center p-4' : 'justify-between p-4'}`}>
+              {!isCollapsed && (
+                <h1 className="text-xl font-bold">Student Learning</h1>
+              )}
+              <button
+                onClick={() => setIsCollapsed(!isCollapsed)}
+                className={`p-2 cursor-pointer rounded-full ${darkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100'}`}
+              >
+                {isCollapsed ? <FiMenu size={20} /> : <FiX size={20} />}
+              </button>
+            </div>
+          )}
 
           {/* Sidebar Menu */}
           <nav className="flex-1 overflow-y-auto">
@@ -86,15 +121,15 @@ const Sidebar = ({ darkMode, toggleDarkMode, setActiveComponent }) => {
             </ul>
           </nav>
 
-          {/* Sidebar Footer */}
+          {/* Sidebar Footer - Only show in expanded mode */}
           {!isCollapsed && (
-            <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+            <div className={`p-4 border-t ${darkMode ? 'border-gray-700' : 'border-gray-200'}`}>
               <div className="flex items-center justify-between">
                 <div className="flex items-center">
-                  <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white mr-2">
+                  <div className={`w-8 h-8 rounded-full ${darkMode ? 'bg-blue-500' : 'bg-blue-400'} flex items-center justify-center text-white mr-2`}>
                     U
                   </div>
-                  <span className={darkMode ? 'text-white' : 'text-gray-800'}>User</span>
+                  <span>User</span>
                 </div>
                 <button
                   onClick={toggleDarkMode}
@@ -109,18 +144,9 @@ const Sidebar = ({ darkMode, toggleDarkMode, setActiveComponent }) => {
       </div>
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Navbar */}
-        <div
-          className={`flex items-center justify-between p-4 shadow-sm ${
-            darkMode ? 'bg-gray-900 text-white' : 'bg-white text-gray-800'
-          }`}
-        >
-        </div>
-
-        {/* Page Content would go here */}
-        <div className="flex-1 overflow-y-auto p-4">
-          {/* Your main content would be rendered here based on activeComponent */}
+      <div className="flex-1 overflow-auto">
+        <div className={`min-h-full p-4 ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-gray-800'}`}>
+          {/* Your main content would be rendered here */}
         </div>
       </div>
     </div>

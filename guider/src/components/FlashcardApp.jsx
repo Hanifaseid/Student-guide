@@ -186,7 +186,7 @@ const FlashcardApp = ({ darkMode }) => {
         <>
           <div className="controls mb-8">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-              <div className="search-container flex-1">
+              <div className="search-container  flex-1">
                 <input
                   type="text"
                   value={searchTerm}

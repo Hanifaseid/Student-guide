@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
+const ResourcesHub = ({ darkMode = true }) => {
 
-const ResourcesHub = ({ darkMode }) => {
   const [resources, setResources] = useState([
     { 
       id: 1, 

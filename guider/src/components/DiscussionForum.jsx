@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FiArrowLeft, FiThumbsUp, FiMessageSquare, FiSearch, FiPlus, FiChevronDown, FiChevronUp, FiX } from 'react-icons/fi';
+const DiscussionForum  = ({ darkMode = true }) => {
 
-const DiscussionForum = ({ darkMode }) => {
   const [topics, setTopics] = useState([
     { 
       id: 1, 

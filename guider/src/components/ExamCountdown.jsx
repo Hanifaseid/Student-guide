@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FiPlus, FiTrash2, FiEdit2, FiCheck, FiX, FiCalendar, FiBook, FiClock, FiFilter, FiSearch, FiChevronDown, FiChevronUp } from 'react-icons/fi';
+const ExamCountdown  = ({ darkMode = true }) => {
 
-const ExamCountdown = ({ darkMode }) => {
   // Load exams from localStorage if available
   const [exams, setExams] = useState(() => {
     const savedExams = localStorage.getItem('exams');
@@ -379,7 +379,7 @@ const ExamCountdown = ({ darkMode }) => {
                   {expandedSections.motivation ? <FiChevronUp /> : <FiChevronDown />}
                 </div>
                 
-                {expandedSections.motivation && (
+                {expandedSections.motivation && (  
                   <div className="p-4 pt-0">
                     <div className={`p-3 rounded-lg italic ${darkMode ? 'bg-gray-600' : 'bg-white'} mb-2`}>
                       "{currentQuote}"

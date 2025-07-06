@@ -12,7 +12,7 @@ import ReadingTrainer from './components/ReadingTrainer';
 import ExamCountdown from './components/ExamCountdown';
 
 function App() {
-  const [darkMode, setDarkMode] = useState(false);
+  const [darkMode, setDarkMode] = useState(true);
   const [activeComponent, setActiveComponent] = useState('FlashcardApp');
 
   const toggleDarkMode = () => {

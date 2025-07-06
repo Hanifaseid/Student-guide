@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { FiAward, FiClock, FiStar, FiTrendingUp, FiCheckCircle, FiZap } from 'react-icons/fi';
 import { FaFire, FaCrown, FaMedal, FaTrophy } from 'react-icons/fa';
+const GamifiedLearning  = ({ darkMode = true }) => {
 
-const GamifiedLearning = ({ darkMode }) => {
   const [userStats, setUserStats] = useState({
     level: 3,
     xp: 1250,

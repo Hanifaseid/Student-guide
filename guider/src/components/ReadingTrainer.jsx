@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FiBook, FiCheck, FiX, FiRotateCcw, FiInfo, FiAward, FiClock, FiBarChart2 } from 'react-icons/fi';
+const ReadingTrainer  = ({ darkMode = true }) => {
 
-const ReadingTrainer = ({ darkMode }) => {
   const passages = [
     {
       id: 1,

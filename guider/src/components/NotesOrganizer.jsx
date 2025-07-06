@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-const NotesOrganizer = ({ darkMode }) => {
+const NotesOrganizer = ({ darkMode = true }) => {  // Changed default to true
   const [notes, setNotes] = useState([
     { id: 1, title: 'React Basics', content: 'React is a JavaScript library for building user interfaces...', tags: ['react', 'frontend'] },
     { id: 2, title: 'CSS Frameworks', content: 'Tailwind CSS is a utility-first CSS framework for rapidly building custom designs...', tags: ['css', 'tailwind'] },
