@@ -1,19 +1,17 @@
 import { useState } from 'react';
 import Sidebar from './components/Sidebar';
-import FlashcardApp from './components/FlashcardApp';
 import StudyTracker from './components/StudyTracker';
 import StudyPlanner from './components/StudyPlanner';
 import NotesOrganizer from './components/NotesOrganizer';
 import QuizMaker from './components/QuizMaker';
 import ResourcesHub from './components/ResourcesHub';
-import GamifiedLearning from './components/GamifiedLearning';
 import DiscussionForum from './components/DiscussionForum';
 import ReadingTrainer from './components/ReadingTrainer';
 import ExamCountdown from './components/ExamCountdown';
 
 function App() {
   const [darkMode, setDarkMode] = useState(true);
-  const [activeComponent, setActiveComponent] = useState('FlashcardApp');
+  const [activeComponent, setActiveComponent] = useState('StudyTracker');
 
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
@@ -21,17 +19,16 @@ function App() {
 
   const renderComponent = () => {
     switch (activeComponent) {
-      case 'FlashcardApp': return <FlashcardApp darkMode={darkMode} />;
+
       case 'StudyTracker': return <StudyTracker darkMode={darkMode} />;
       case 'StudyPlanner': return <StudyPlanner darkMode={darkMode} />;
       case 'NotesOrganizer': return <NotesOrganizer darkMode={darkMode} />;
       case 'QuizMaker': return <QuizMaker darkMode={darkMode} />;
       case 'ResourcesHub': return <ResourcesHub darkMode={darkMode} />;
-      case 'GamifiedLearning': return <GamifiedLearning darkMode={darkMode} />;
       case 'DiscussionForum': return <DiscussionForum darkMode={darkMode} />;
       case 'ReadingTrainer': return <ReadingTrainer darkMode={darkMode} />;
       case 'ExamCountdown': return <ExamCountdown darkMode={darkMode} />;
-      default: return <FlashcardApp darkMode={darkMode} />;
+      default: return <StudyTracker darkMode={darkMode} />;
     }
   };
 

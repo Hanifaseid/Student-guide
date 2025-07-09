@@ -23,13 +23,11 @@ const Sidebar = ({ darkMode = true, toggleDarkMode, setActiveComponent }) => {
   const [activeItem, setActiveItem] = useState('FlashcardApp');
 
   const menuItems = [
-    { name: 'FlashcardApp', label: 'Smart Flashcard', icon: <FiBookmark size={18} /> },
     { name: 'StudyTracker', label: 'Study Tracker', icon: <FiPieChart size={18} /> },
     { name: 'StudyPlanner', label: 'Study Planner', icon: <FiCalendar size={18} /> },
     { name: 'NotesOrganizer', label: 'Notes Organizer', icon: <FiFileText size={18} /> },
     { name: 'QuizMaker', label: 'Quiz Maker', icon: <FiHelpCircle size={18} /> },
     { name: 'ResourcesHub', label: 'Study Resources', icon: <FiBook size={18} /> },
-    { name: 'GamifiedLearning', label: 'Gamified Learning', icon: <FiAward size={18} /> },
     { name: 'DiscussionForum', label: 'Peer Study', icon: <FiUsers size={18} /> },
     { name: 'ReadingTrainer', label: 'Reading Comprehension', icon: <FiLayers size={18} /> },
     { name: 'ExamCountdown', label: 'Exam Countdown', icon: <FiClock size={18} /> },
@@ -59,11 +57,11 @@ const Sidebar = ({ darkMode = true, toggleDarkMode, setActiveComponent }) => {
     }
   };
 
-    return (
+  return (
     <div className="flex h-screen overflow-hidden">
       {/* Mobile Navbar - Only shown when on mobile */}
       {isMobile && (
-        <div className={`fixed top-0 left-0 right-0 flex items-center p-4 shadow-sm z-20 ${darkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-800'}`}>
+        <div className={`fixed top-0 left-0 right-0 flex items-center p-4 pb-5 shadow-sm z-20 ${darkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-800'}`}>
           <button
             onClick={() => setIsCollapsed(!isCollapsed)}
             className={`p-2 cursor-pointer rounded-full ${darkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100'}`}
@@ -78,7 +76,7 @@ const Sidebar = ({ darkMode = true, toggleDarkMode, setActiveComponent }) => {
       <div
         className={`${darkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-800'} shadow-lg transition-all duration-300 ease-in-out ${
           isCollapsed ? 'w-16 md:w-20' : 'w-64'
-        } ${isMobile ? 'fixed h-full z-10' : 'relative'} ${isMobile && isCollapsed ? 'hidden' : ''}`}
+        } ${isMobile ? 'fixed top-16 h-[calc(100%-4rem)] z-10' : 'relative'} ${isMobile && isCollapsed ? 'hidden' : ''}`}
       >
         <div className="flex flex-col h-full">
           {/* Sidebar Header - Hidden on mobile */}
@@ -145,7 +143,7 @@ const Sidebar = ({ darkMode = true, toggleDarkMode, setActiveComponent }) => {
 
       {/* Main Content Area */}
       <div className="flex-1 overflow-auto">
-        <div className={`min-h-full p-4 ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-gray-800'}`}>
+        <div className={`min-h-full p-4 ${isMobile ? 'pt-20' : ''} ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-gray-800'}`}>
           {/* Your main content would be rendered here */}
         </div>
       </div>
