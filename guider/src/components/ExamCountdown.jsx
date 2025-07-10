@@ -1,7 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { FiPlus, FiTrash2, FiEdit2, FiCheck, FiX, FiCalendar, FiBook, FiClock, FiFilter, FiSearch, FiChevronDown, FiChevronUp } from 'react-icons/fi';
-const ExamCountdown  = ({ darkMode = true }) => {
+import { motion, AnimatePresence } from 'framer-motion';
+import { 
+  FiPlus, FiTrash2, FiEdit2, FiCheck, FiX, FiCalendar, 
+  FiBook, FiClock, FiFilter, FiSearch, FiChevronDown, 
+  FiChevronUp, FiAward, FiList, FiBookmark, FiAlertTriangle, 
+  FiBarChart2, FiCheckCircle, FiLayers 
+} from 'react-icons/fi';
+import { 
+  FaBook, FaCalendarAlt, FaFilter, FaSearch, 
+  FaTasks, FaLightbulb, FaChartPie, FaRegStar,
+  FaRegCheckCircle, FaRegClock
+} from 'react-icons/fa';
 
+const ExamCountdown = ({ darkMode = true }) => {
   // Load exams from localStorage if available
   const [exams, setExams] = useState(() => {
     const savedExams = localStorage.getItem('exams');
@@ -239,260 +250,399 @@ const ExamCountdown  = ({ darkMode = true }) => {
   const completedTasks = exams.reduce((sum, exam) => sum + exam.tasks.filter(t => t.completed).length, 0);
   const overallProgress = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
 
+  // Animation variants
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        when: "beforeChildren",
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: {
+        type: "spring",
+        stiffness: 100
+      }
+    }
+  };
+
+  const fadeIn = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1, transition: { duration: 0.5 } }
+  };
+
+  const slideUp = {
+    hidden: { y: 50, opacity: 0 },
+    visible: { y: 0, opacity: 1, transition: { duration: 0.5 } }
+  };
+
   return (
-    <div className={`min-h-screen p-4 md:p-8 ${darkMode ? 'bg-gray-900 text-gray-100' : 'bg-gray-50 text-gray-800'}`}>
-      <div className={`max-w-7xl mx-auto rounded-xl overflow-hidden shadow-xl ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
+    <motion.div 
+      initial="hidden"
+      animate="visible"
+      variants={containerVariants}
+      className={`min-h-screen p-4 md:p-8 ${darkMode ? 'bg-gradient-to-br from-gray-900 to-gray-800 text-gray-100' : 'bg-gradient-to-br from-gray-50 to-gray-100 text-gray-800'}`}
+    >
+      <motion.div 
+        variants={slideUp}
+        className={`max-w-7xl mx-auto rounded-xl overflow-hidden shadow-2xl ${darkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200'}`}
+      >
         <div className="p-6 md:p-8">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
+          <motion.div 
+            variants={itemVariants}
+            className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8"
+          >
             <div>
-              <h1 className="text-3xl font-bold mb-2">Exam Countdown</h1>
-              <p className={`${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+              <motion.h1 
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.2 }}
+                className="text-3xl font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500"
+              >
+                Exam Countdown
+              </motion.h1>
+              <motion.p 
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.3 }}
+                className={`${darkMode ? 'text-gray-300' : 'text-gray-600'}`}
+              >
                 Stay organized and motivated for your upcoming exams
-              </p>
+              </motion.p>
             </div>
             
-            <div className="mt-4 md:mt-0 flex items-center space-x-2">
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+              className="mt-4 md:mt-0 flex items-center space-x-2"
+            >
               <div className={`px-3 py-1 rounded-full text-sm font-medium ${
                 darkMode ? 'bg-gray-700' : 'bg-gray-200'
               }`}>
                 {completedTasks}/{totalTasks} tasks completed
               </div>
               <div className="w-24 h-2 rounded-full bg-gray-300">
-                <div 
-                  className="h-full rounded-full bg-green-500" 
-                  style={{ width: `${overallProgress}%` }}
+                <motion.div 
+                  initial={{ width: 0 }}
+                  animate={{ width: `${overallProgress}%` }}
+                  transition={{ delay: 0.5, duration: 1 }}
+                  className="h-full rounded-full bg-gradient-to-r from-green-400 to-blue-500" 
                 />
               </div>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
           
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
             {/* Left sidebar - Organized Sections */}
             <div className="lg:col-span-1 space-y-4">
               {/* Add New Exam Section */}
-              <div className={`rounded-xl overflow-hidden ${darkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
-                <div 
+              <motion.div 
+                variants={itemVariants}
+                className={`rounded-xl overflow-hidden ${darkMode ? 'bg-gray-700' : 'bg-gray-100'} shadow-md`}
+              >
+                <motion.div 
+                  whileHover={{ scale: 1.01 }}
+                  whileTap={{ scale: 0.99 }}
                   className={`p-4 flex justify-between items-center cursor-pointer ${darkMode ? 'hover:bg-gray-600' : 'hover:bg-gray-200'}`}
                   onClick={() => toggleSection('addExam')}
                 >
                   <h3 className="font-semibold flex items-center">
-                    <FiPlus className="mr-2" /> Add New Exam
+                    <FaCalendarAlt className="mr-2 text-blue-500" /> Add New Exam
                   </h3>
                   {expandedSections.addExam ? <FiChevronUp /> : <FiChevronDown />}
-                </div>
+                </motion.div>
                 
-                {expandedSections.addExam && (
-                  <div className="p-4 pt-0 space-y-3">
-                    <div>
-                      <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                        Exam Name
-                      </label>
-                      <input
-                        type="text"
-                        value={newExam.name}
-                        onChange={(e) => setNewExam({...newExam, name: e.target.value})}
-                        placeholder="e.g. Final Calculus Exam"
-                        className={`w-full p-2 rounded-lg ${darkMode ? 'bg-gray-600 text-white placeholder-gray-400' : 'bg-white placeholder-gray-500'}`}
-                      />
-                    </div>
-                    
-                    <div>
-                      <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                        Subject
-                      </label>
-                      <input
-                        type="text"
-                        value={newExam.subject}
-                        onChange={(e) => setNewExam({...newExam, subject: e.target.value})}
-                        placeholder="e.g. Mathematics"
-                        className={`w-full p-2 rounded-lg ${darkMode ? 'bg-gray-600 text-white placeholder-gray-400' : 'bg-white placeholder-gray-500'}`}
-                      />
-                    </div>
-                    
-                    <div>
-                      <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                        Exam Date
-                      </label>
-                      <div className="relative">
-                        <input
-                          type="date"
-                          value={newExam.date}
-                          onChange={(e) => setNewExam({...newExam, date: e.target.value})}
-                          className={`w-full p-2 rounded-lg ${darkMode ? 'bg-gray-600 text-white' : 'bg-white'} pr-8`}
-                        />
-                        <FiCalendar className={`absolute right-2 top-2.5 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`} />
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                        Priority
-                      </label>
-                      <select
-                        value={newExam.priority}
-                        onChange={(e) => setNewExam({...newExam, priority: e.target.value})}
-                        className={`w-full p-2 rounded-lg ${darkMode ? 'bg-gray-600 text-white' : 'bg-white'}`}
-                      >
-                        <option value="high">High</option>
-                        <option value="medium">Medium</option>
-                        <option value="low">Low</option>
-                      </select>
-                    </div>
-                    
-                    <div>
-                      <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                        Notes
-                      </label>
-                      <textarea
-                        value={newExam.notes}
-                        onChange={(e) => setNewExam({...newExam, notes: e.target.value})}
-                        placeholder="Additional information..."
-                        rows="2"
-                        className={`w-full p-2 rounded-lg ${darkMode ? 'bg-gray-600 text-white placeholder-gray-400' : 'bg-white placeholder-gray-500'}`}
-                      />
-                    </div>
-                    
-                    <button
-                      onClick={addExam}
-                      disabled={!newExam.name || !newExam.date}
-                      className={`w-full py-2 px-4 rounded-lg font-medium transition-colors ${
-                        (!newExam.name || !newExam.date) ? 
-                          (darkMode ? 'bg-gray-600 text-gray-400 cursor-not-allowed' : 'bg-gray-300 text-gray-500 cursor-not-allowed') : 
-                          (darkMode ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-blue-500 hover:bg-blue-600 text-white')
-                      }`}
+                <AnimatePresence>
+                  {expandedSections.addExam && (
+                    <motion.div 
+                      initial="hidden"
+                      animate="visible"
+                      exit="hidden"
+                      variants={{
+                        hidden: { opacity: 0, height: 0 },
+                        visible: { opacity: 1, height: 'auto' }
+                      }}
+                      className="overflow-hidden"
                     >
-                      Add Exam
-                    </button>
-                  </div>
-                )}
-              </div>
+                      <div className="p-4 pt-0 space-y-3">
+                        <motion.div variants={fadeIn}>
+                          <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                            Exam Name
+                          </label>
+                          <input
+                            type="text"
+                            value={newExam.name}
+                            onChange={(e) => setNewExam({...newExam, name: e.target.value})}
+                            placeholder="e.g. Final Calculus Exam"
+                            className={`w-full p-2 rounded-lg ${darkMode ? 'bg-gray-600 text-white placeholder-gray-400' : 'bg-white placeholder-gray-500'}`}
+                          />
+                        </motion.div>
+                        
+                        <motion.div variants={fadeIn}>
+                          <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                            Subject
+                          </label>
+                          <input
+                            type="text"
+                            value={newExam.subject}
+                            onChange={(e) => setNewExam({...newExam, subject: e.target.value})}
+                            placeholder="e.g. Mathematics"
+                            className={`w-full p-2 rounded-lg ${darkMode ? 'bg-gray-600 text-white placeholder-gray-400' : 'bg-white placeholder-gray-500'}`}
+                          />
+                        </motion.div>
+                        
+                        <motion.div variants={fadeIn}>
+                          <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                            Exam Date
+                          </label>
+                          <div className="relative">
+                            <input
+                              type="date"
+                              value={newExam.date}
+                              onChange={(e) => setNewExam({...newExam, date: e.target.value})}
+                              className={`w-full p-2 rounded-lg ${darkMode ? 'bg-gray-600 text-white' : 'bg-white'} pr-8`}
+                            />
+                            <FiCalendar className={`absolute right-2 top-2.5 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`} />
+                          </div>
+                        </motion.div>
+                        
+                        <motion.div variants={fadeIn}>
+                          <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                            Priority
+                          </label>
+                          <select
+                            value={newExam.priority}
+                            onChange={(e) => setNewExam({...newExam, priority: e.target.value})}
+                            className={`w-full p-2 rounded-lg ${darkMode ? 'bg-gray-600 text-white' : 'bg-white'}`}
+                          >
+                            <option value="high">High</option>
+                            <option value="medium">Medium</option>
+                            <option value="low">Low</option>
+                          </select>
+                        </motion.div>
+                        
+                        <motion.div variants={fadeIn}>
+                          <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                            Notes
+                          </label>
+                          <textarea
+                            value={newExam.notes}
+                            onChange={(e) => setNewExam({...newExam, notes: e.target.value})}
+                            placeholder="Additional information..."
+                            rows="2"
+                            className={`w-full p-2 rounded-lg ${darkMode ? 'bg-gray-600 text-white placeholder-gray-400' : 'bg-white placeholder-gray-500'}`}
+                          />
+                        </motion.div>
+                        
+                        <motion.button
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                          onClick={addExam}
+                          disabled={!newExam.name || !newExam.date}
+                          className={`w-full py-2 px-4 rounded-lg font-medium transition-colors ${
+                            (!newExam.name || !newExam.date) ? 
+                              (darkMode ? 'bg-gray-600 text-gray-400 cursor-not-allowed' : 'bg-gray-300 text-gray-500 cursor-not-allowed') : 
+                              'bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white'
+                          }`}
+                        >
+                          Add Exam
+                        </motion.button>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
               
               {/* Motivation Section */}
-              <div className={`rounded-xl overflow-hidden ${darkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
-                <div 
+              <motion.div 
+                variants={itemVariants}
+                className={`rounded-xl overflow-hidden ${darkMode ? 'bg-gray-700' : 'bg-gray-100'} shadow-md`}
+              >
+                <motion.div 
+                  whileHover={{ scale: 1.01 }}
+                  whileTap={{ scale: 0.99 }}
                   className={`p-4 flex justify-between items-center cursor-pointer ${darkMode ? 'hover:bg-gray-600' : 'hover:bg-gray-200'}`}
                   onClick={() => toggleSection('motivation')}
                 >
                   <h3 className="font-semibold flex items-center">
-                    <FiBook className="mr-2" /> Motivation
+                    <FaLightbulb className="mr-2 text-yellow-500" /> Motivation
                   </h3>
                   {expandedSections.motivation ? <FiChevronUp /> : <FiChevronDown />}
-                </div>
+                </motion.div>
                 
-                {expandedSections.motivation && (  
-                  <div className="p-4 pt-0">
-                    <div className={`p-3 rounded-lg italic ${darkMode ? 'bg-gray-600' : 'bg-white'} mb-2`}>
-                      "{currentQuote}"
-                    </div>
-                    <button 
-                      onClick={changeQuote}
-                      className={`w-full py-2 px-4 rounded-lg font-medium ${
-                        darkMode ? 'bg-gray-600 hover:bg-gray-500 text-white' : 'bg-gray-200 hover:bg-gray-300'
-                      }`}
+                <AnimatePresence>
+                  {expandedSections.motivation && (  
+                    <motion.div 
+                      initial="hidden"
+                      animate="visible"
+                      exit="hidden"
+                      variants={{
+                        hidden: { opacity: 0, height: 0 },
+                        visible: { opacity: 1, height: 'auto' }
+                      }}
+                      className="overflow-hidden"
                     >
-                      New Quote
-                    </button>
-                  </div>
-                )}
-              </div>
+                      <div className="p-4 pt-0">
+                        <motion.div 
+                          key={currentQuote}
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          exit={{ opacity: 0 }}
+                          className={`p-3 rounded-lg italic ${darkMode ? 'bg-gray-600' : 'bg-white'} mb-2`}
+                        >
+                          "{currentQuote}"
+                        </motion.div>
+                        <motion.button 
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                          onClick={changeQuote}
+                          className={`w-full py-2 px-4 rounded-lg font-medium ${
+                            darkMode ? 'bg-gray-600 hover:bg-gray-500 text-white' : 'bg-gray-200 hover:bg-gray-300'
+                          }`}
+                        >
+                          New Quote
+                        </motion.button>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
               
               {/* Filters Section */}
-              <div className={`rounded-xl overflow-hidden ${darkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
-                <div 
+              <motion.div 
+                variants={itemVariants}
+                className={`rounded-xl overflow-hidden ${darkMode ? 'bg-gray-700' : 'bg-gray-100'} shadow-md`}
+              >
+                <motion.div 
+                  whileHover={{ scale: 1.01 }}
+                  whileTap={{ scale: 0.99 }}
                   className={`p-4 flex justify-between items-center cursor-pointer ${darkMode ? 'hover:bg-gray-600' : 'hover:bg-gray-200'}`}
                   onClick={() => toggleSection('filters')}
                 >
                   <h3 className="font-semibold flex items-center">
-                    <FiFilter className="mr-2" /> Filters
+                    <FaFilter className="mr-2 text-purple-500" /> Filters
                   </h3>
                   {expandedSections.filters ? <FiChevronUp /> : <FiChevronDown />}
-                </div>
+                </motion.div>
                 
-                {expandedSections.filters && (
-                  <div className="p-4 pt-0 space-y-3">
-                    <div>
-                      <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                        Search Exams
-                      </label>
-                      <div className="relative">
-                        <input
-                          type="text"
-                          value={searchTerm}
-                          onChange={(e) => setSearchTerm(e.target.value)}
-                          placeholder="Search by name or subject"
-                          className={`w-full p-2 rounded-lg ${darkMode ? 'bg-gray-600 text-white placeholder-gray-400' : 'bg-white placeholder-gray-500'} pl-8`}
-                        />
-                        <FiSearch className={`absolute left-2 top-2.5 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`} />
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                        Priority
-                      </label>
-                      <select
-                        value={filterPriority}
-                        onChange={(e) => setFilterPriority(e.target.value)}
-                        className={`w-full p-2 rounded-lg ${darkMode ? 'bg-gray-600 text-white' : 'bg-white'}`}
-                      >
-                        <option value="all">All Priorities</option>
-                        <option value="high">High</option>
-                        <option value="medium">Medium</option>
-                        <option value="low">Low</option>
-                      </select>
-                    </div>
-                    
-                    <div>
-                      <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                        Exam Status
-                      </label>
-                      <div className="grid grid-cols-2 gap-2">
-                        <button
-                          onClick={() => setActiveTab('upcoming')}
-                          className={`py-2 rounded-lg font-medium text-sm ${
-                            activeTab === 'upcoming' ? 
-                              (darkMode ? 'bg-blue-600 text-white' : 'bg-blue-500 text-white') : 
-                              (darkMode ? 'bg-gray-600 text-gray-300' : 'bg-gray-200 text-gray-700')
-                          }`}
+                <AnimatePresence>
+                  {expandedSections.filters && (
+                    <motion.div 
+                      initial="hidden"
+                      animate="visible"
+                      exit="hidden"
+                      variants={{
+                        hidden: { opacity: 0, height: 0 },
+                        visible: { opacity: 1, height: 'auto' }
+                      }}
+                      className="overflow-hidden"
+                    >
+                      <div className="p-4 pt-0 space-y-3">
+                        <motion.div variants={fadeIn}>
+                          <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                            Search Exams
+                          </label>
+                          <div className="relative">
+                            <input
+                              type="text"
+                              value={searchTerm}
+                              onChange={(e) => setSearchTerm(e.target.value)}
+                              placeholder="Search by name or subject"
+                              className={`w-full p-2 rounded-lg ${darkMode ? 'bg-gray-600 text-white placeholder-gray-400' : 'bg-white placeholder-gray-500'} pl-8`}
+                            />
+                            <FaSearch className={`absolute left-2 top-2.5 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`} />
+                          </div>
+                        </motion.div>
+                        
+                        <motion.div variants={fadeIn}>
+                          <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                            Priority
+                          </label>
+                          <select
+                            value={filterPriority}
+                            onChange={(e) => setFilterPriority(e.target.value)}
+                            className={`w-full p-2 rounded-lg ${darkMode ? 'bg-gray-600 text-white' : 'bg-white'}`}
+                          >
+                            <option value="all">All Priorities</option>
+                            <option value="high">High</option>
+                            <option value="medium">Medium</option>
+                            <option value="low">Low</option>
+                          </select>
+                        </motion.div>
+                        
+                        <motion.div variants={fadeIn}>
+                          <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                            Exam Status
+                          </label>
+                          <div className="grid grid-cols-2 gap-2">
+                            <motion.button
+                              whileHover={{ scale: 1.02 }}
+                              whileTap={{ scale: 0.98 }}
+                              onClick={() => setActiveTab('upcoming')}
+                              className={`py-2 rounded-lg font-medium text-sm ${
+                                activeTab === 'upcoming' ? 
+                                  'bg-gradient-to-r from-blue-500 to-blue-600 text-white' : 
+                                  (darkMode ? 'bg-gray-600 text-gray-300' : 'bg-gray-200 text-gray-700')
+                              }`}
+                            >
+                              Upcoming
+                            </motion.button>
+                            <motion.button
+                              whileHover={{ scale: 1.02 }}
+                              whileTap={{ scale: 0.98 }}
+                              onClick={() => setActiveTab('past')}
+                              className={`py-2 rounded-lg font-medium text-sm ${
+                                activeTab === 'past' ? 
+                                  'bg-gradient-to-r from-purple-500 to-purple-600 text-white' : 
+                                  (darkMode ? 'bg-gray-600 text-gray-300' : 'bg-gray-200 text-gray-700')
+                              }`}
+                            >
+                              Past
+                            </motion.button>
+                          </div>
+                        </motion.div>
+                        
+                        <motion.div 
+                          variants={fadeIn}
+                          className="flex items-center"
                         >
-                          Upcoming
-                        </button>
-                        <button
-                          onClick={() => setActiveTab('past')}
-                          className={`py-2 rounded-lg font-medium text-sm ${
-                            activeTab === 'past' ? 
-                              (darkMode ? 'bg-blue-600 text-white' : 'bg-blue-500 text-white') : 
-                              (darkMode ? 'bg-gray-600 text-gray-300' : 'bg-gray-200 text-gray-700')
-                          }`}
-                        >
-                          Past
-                        </button>
+                          <input
+                            type="checkbox"
+                            id="showCompleted"
+                            checked={showCompleted}
+                            onChange={() => setShowCompleted(!showCompleted)}
+                            className="mr-2 h-4 w-4 rounded"
+                          />
+                          <label htmlFor="showCompleted" className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                            Show completed tasks
+                          </label>
+                        </motion.div>
                       </div>
-                    </div>
-                    
-                    <div className="flex items-center">
-                      <input
-                        type="checkbox"
-                        id="showCompleted"
-                        checked={showCompleted}
-                        onChange={() => setShowCompleted(!showCompleted)}
-                        className="mr-2 h-4 w-4 rounded"
-                      />
-                      <label htmlFor="showCompleted" className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                        Show completed tasks
-                      </label>
-                    </div>
-                  </div>
-                )}
-              </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
             </div>
             
             {/* Main content - Exams List and Details */}
             <div className="lg:col-span-3 space-y-6">
               {/* Exams List */}
-              <div className={`p-5 rounded-xl ${darkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
+              <motion.div 
+                variants={itemVariants}
+                className={`p-5 rounded-xl ${darkMode ? 'bg-gray-700' : 'bg-gray-100'} shadow-md`}
+              >
                 <div className="flex justify-between items-center mb-4">
-                  <h3 className="font-semibold text-lg">
+                  <h3 className="font-semibold text-lg flex items-center">
+                    <FaBook className="mr-2 text-blue-500" />
                     {activeTab === 'upcoming' ? 'Upcoming Exams' : 'Past Exams'}
                   </h3>
                   <div className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
@@ -501,14 +651,21 @@ const ExamCountdown  = ({ darkMode = true }) => {
                 </div>
                 
                 {sortedExams.length > 0 ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                    {sortedExams.map(exam => {
+                  <motion.div 
+                    variants={containerVariants}
+                    initial="hidden"
+                    animate="visible"
+                    className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"
+                  >
+                    {sortedExams.map((exam, index) => {
                       const daysLeft = calculateDaysLeft(exam.date);
                       const isPast = daysLeft < 0;
                       
                       return (
-                        <div 
-                          key={exam.id} 
+                        <motion.div 
+                          key={exam.id}
+                          variants={itemVariants}
+                          whileHover={{ y: -5 }}
                           className={`p-4 rounded-xl cursor-pointer transition-all hover:shadow-md ${
                             darkMode ? 'bg-gray-600 hover:bg-gray-500' : 'bg-white hover:bg-gray-50'
                           } border ${
@@ -555,18 +712,20 @@ const ExamCountdown  = ({ darkMode = true }) => {
                                 Tasks: {exam.tasks.filter(t => t.completed).length}/{exam.tasks.length}
                               </span>
                               <div className="flex-1 h-2 rounded-full bg-gray-300">
-                                <div 
-                                  className="h-full rounded-full ${
-                                    exam.tasks.length > 0 ? 
-                                      (exam.tasks.filter(t => t.completed).length / exam.tasks.length * 100 >= 75 ? 'bg-green-500' :
-                                       exam.tasks.filter(t => t.completed).length / exam.tasks.length * 100 >= 50 ? 'bg-yellow-500' : 'bg-red-500') : 
-                                      'bg-gray-400'
-                                  }" 
-                                  style={{ 
+                                <motion.div 
+                                  initial={{ width: 0 }}
+                                  animate={{ 
                                     width: `${exam.tasks.length > 0 ? 
                                       (exam.tasks.filter(t => t.completed).length / exam.tasks.length) * 100 : 
                                       0}%` 
                                   }}
+                                  transition={{ delay: index * 0.1 }}
+                                  className={`h-full rounded-full ${
+                                    exam.tasks.length > 0 ? 
+                                      (exam.tasks.filter(t => t.completed).length / exam.tasks.length * 100 >= 75 ? 'bg-green-500' :
+                                       exam.tasks.filter(t => t.completed).length / exam.tasks.length * 100 >= 50 ? 'bg-yellow-500' : 'bg-red-500') : 
+                                      'bg-gray-400'
+                                  }`}
                                 />
                               </div>
                             </div>
@@ -576,7 +735,9 @@ const ExamCountdown  = ({ darkMode = true }) => {
                             <div className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                               <FiCalendar className="inline mr-1" /> {exam.date}
                             </div>
-                            <button
+                            <motion.button
+                              whileHover={{ scale: 1.1 }}
+                              whileTap={{ scale: 0.9 }}
                               onClick={(e) => {
                                 e.stopPropagation();
                                 deleteExam(exam.id);
@@ -585,14 +746,18 @@ const ExamCountdown  = ({ darkMode = true }) => {
                               aria-label="Delete exam"
                             >
                               <FiTrash2 size={14} />
-                            </button>
+                            </motion.button>
                           </div>
-                        </div>
+                        </motion.div>
                       );
                     })}
-                  </div>
+                  </motion.div>
                 ) : (
-                  <div className={`text-center py-8 rounded-lg ${darkMode ? 'bg-gray-600' : 'bg-white'}`}>
+                  <motion.div 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className={`text-center py-8 rounded-lg ${darkMode ? 'bg-gray-600' : 'bg-white'}`}
+                  >
                     <svg 
                       className={`mx-auto h-12 w-12 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`} 
                       fill="none" 
@@ -609,29 +774,37 @@ const ExamCountdown  = ({ darkMode = true }) => {
                         'Try adjusting your search or filters' : 
                         'Add a new exam to get started'}
                     </p>
-                  </div>
+                  </motion.div>
                 )}
-              </div>
+              </motion.div>
               
               {/* Exam Detail View */}
               {activeExam && (
-                <div className={`p-5 rounded-xl ${darkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
+                <motion.div 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className={`p-5 rounded-xl ${darkMode ? 'bg-gray-700' : 'bg-gray-100'} shadow-md`}
+                >
                   {editMode ? (
                     <div className="space-y-4">
                       <div className="flex justify-between items-center">
-                        <h3 className="font-semibold text-xl">Edit Exam</h3>
+                        <h3 className="font-semibold text-xl flex items-center">
+                          <FiEdit2 className="mr-2 text-blue-500" /> Edit Exam
+                        </h3>
                         <div className="flex space-x-2">
-                          <button
+                          <motion.button
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
                             onClick={() => setEditMode(false)}
                             className={`p-2 rounded-full ${darkMode ? 'hover:bg-gray-600' : 'hover:bg-gray-200'}`}
                           >
                             <FiX />
-                          </button>
+                          </motion.button>
                         </div>
                       </div>
                       
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
+                        <motion.div variants={fadeIn}>
                           <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
                             Exam Name
                           </label>
@@ -641,9 +814,9 @@ const ExamCountdown  = ({ darkMode = true }) => {
                             onChange={(e) => setNewExam({...newExam, name: e.target.value})}
                             className={`w-full p-2 rounded-lg ${darkMode ? 'bg-gray-600 text-white' : 'bg-white'}`}
                           />
-                        </div>
+                        </motion.div>
                         
-                        <div>
+                        <motion.div variants={fadeIn}>
                           <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
                             Subject
                           </label>
@@ -653,9 +826,9 @@ const ExamCountdown  = ({ darkMode = true }) => {
                             onChange={(e) => setNewExam({...newExam, subject: e.target.value})}
                             className={`w-full p-2 rounded-lg ${darkMode ? 'bg-gray-600 text-white' : 'bg-white'}`}
                           />
-                        </div>
+                        </motion.div>
                         
-                        <div>
+                        <motion.div variants={fadeIn}>
                           <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
                             Exam Date
                           </label>
@@ -665,9 +838,9 @@ const ExamCountdown  = ({ darkMode = true }) => {
                             onChange={(e) => setNewExam({...newExam, date: e.target.value})}
                             className={`w-full p-2 rounded-lg ${darkMode ? 'bg-gray-600 text-white' : 'bg-white'}`}
                           />
-                        </div>
+                        </motion.div>
                         
-                        <div>
+                        <motion.div variants={fadeIn}>
                           <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
                             Priority
                           </label>
@@ -680,9 +853,9 @@ const ExamCountdown  = ({ darkMode = true }) => {
                             <option value="medium">Medium</option>
                             <option value="low">Low</option>
                           </select>
-                        </div>
+                        </motion.div>
                         
-                        <div className="md:col-span-2">
+                        <motion.div variants={fadeIn} className="md:col-span-2">
                           <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
                             Notes
                           </label>
@@ -692,40 +865,48 @@ const ExamCountdown  = ({ darkMode = true }) => {
                             rows="3"
                             className={`w-full p-2 rounded-lg ${darkMode ? 'bg-gray-600 text-white' : 'bg-white'}`}
                           />
-                        </div>
+                        </motion.div>
                       </div>
                       
                       <div className="flex justify-end space-x-3 pt-2">
-                        <button
+                        <motion.button
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
                           onClick={() => setEditMode(false)}
                           className={`px-4 py-2 rounded-lg font-medium ${
                             darkMode ? 'bg-gray-600 hover:bg-gray-500 text-white' : 'bg-gray-200 hover:bg-gray-300'
                           }`}
                         >
                           Cancel
-                        </button>
-                        <button
+                        </motion.button>
+                        <motion.button
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
                           onClick={updateExam}
                           className={`px-4 py-2 rounded-lg font-medium text-white ${
                             darkMode ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'
                           }`}
                         >
                           Save Changes
-                        </button>
+                        </motion.button>
                       </div>
                     </div>
                   ) : (
                     <>
                       <div className="flex justify-between items-start mb-4">
                         <div>
-                          <h3 className="font-semibold text-2xl">{activeExam.name}</h3>
+                          <h3 className="font-semibold text-2xl flex items-center">
+                            <FaBookmark className="mr-2 text-blue-500" /> {activeExam.name}
+                          </h3>
                           <p className={`text-lg ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
                             {activeExam.subject}
                           </p>
                         </div>
                         
                         <div className="flex space-x-2">
-                          <button
+                          <motion.button
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
                             onClick={() => {
                               setNewExam({
                                 name: activeExam.name,
@@ -740,20 +921,27 @@ const ExamCountdown  = ({ darkMode = true }) => {
                             aria-label="Edit exam"
                           >
                             <FiEdit2 />
-                          </button>
-                          <button
+                          </motion.button>
+                          <motion.button
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
                             onClick={() => deleteExam(activeExam.id)}
                             className={`p-2 rounded-full ${darkMode ? 'hover:bg-gray-600 text-red-400' : 'hover:bg-gray-200 text-red-500'}`}
                             aria-label="Delete exam"
                           >
                             <FiTrash2 />
-                          </button>
+                          </motion.button>
                         </div>
                       </div>
                       
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                        <div className={`p-3 rounded-lg ${darkMode ? 'bg-gray-600' : 'bg-gray-200'}`}>
-                          <div className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>Date</div>
+                        <motion.div 
+                          whileHover={{ y: -3 }}
+                          className={`p-3 rounded-lg ${darkMode ? 'bg-gray-600' : 'bg-gray-200'}`}
+                        >
+                          <div className={`text-sm flex items-center ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                            <FaRegClock className="mr-2" /> Date
+                          </div>
                           <div className="font-medium">
                             {new Date(activeExam.date).toLocaleDateString('en-US', { 
                               weekday: 'long', 
@@ -762,20 +950,30 @@ const ExamCountdown  = ({ darkMode = true }) => {
                               day: 'numeric' 
                             })}
                           </div>
-                        </div>
+                        </motion.div>
                         
-                        <div className={`p-3 rounded-lg ${darkMode ? 'bg-gray-600' : 'bg-gray-200'}`}>
-                          <div className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>Priority</div>
+                        <motion.div 
+                          whileHover={{ y: -3 }}
+                          className={`p-3 rounded-lg ${darkMode ? 'bg-gray-600' : 'bg-gray-200'}`}
+                        >
+                          <div className={`text-sm flex items-center ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                            <FiAlertTriangle className="mr-2" /> Priority
+                          </div>
                           <div className="font-medium flex items-center">
                             <span className={`inline-block w-2 h-2 rounded-full mr-2 ${
                               darkMode ? `bg-${getPriorityColor(activeExam.priority)}-500` : `bg-${getPriorityColor(activeExam.priority)}-400`
                             }`} />
                             {getPriorityText(activeExam.priority)}
                           </div>
-                        </div>
+                        </motion.div>
                         
-                        <div className={`p-3 rounded-lg ${darkMode ? 'bg-gray-600' : 'bg-gray-200'}`}>
-                          <div className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>Status</div>
+                        <motion.div 
+                          whileHover={{ y: -3 }}
+                          className={`p-3 rounded-lg ${darkMode ? 'bg-gray-600' : 'bg-gray-200'}`}
+                        >
+                          <div className={`text-sm flex items-center ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                            <FaRegCheckCircle className="mr-2" /> Status
+                          </div>
                           <div className="font-medium">
                             {calculateDaysLeft(activeExam.date) >= 0 ? (
                               <span className={`${
@@ -791,19 +989,26 @@ const ExamCountdown  = ({ darkMode = true }) => {
                               </span>
                             )}
                           </div>
-                        </div>
+                        </motion.div>
                       </div>
                       
                       {activeExam.notes && (
-                        <div className={`p-4 rounded-lg mb-6 ${darkMode ? 'bg-gray-600' : 'bg-white'}`}>
-                          <h4 className="font-semibold mb-2">Notes</h4>
+                        <motion.div 
+                          whileHover={{ y: -3 }}
+                          className={`p-4 rounded-lg mb-6 ${darkMode ? 'bg-gray-600' : 'bg-white'} shadow-sm`}
+                        >
+                          <h4 className="font-semibold mb-2 flex items-center">
+                            <FiBook className="mr-2 text-blue-500" /> Notes
+                          </h4>
                           <p className="whitespace-pre-line">{activeExam.notes}</p>
-                        </div>
+                        </motion.div>
                       )}
                       
                       <div className="mb-6">
                         <div className="flex justify-between items-center mb-4">
-                          <h4 className="font-semibold text-lg">Preparation Tasks</h4>
+                          <h4 className="font-semibold text-lg flex items-center">
+                            <FaTasks className="mr-2 text-blue-500" /> Preparation Tasks
+                          </h4>
                           <div className={`text-sm ${
                             activeExam.tasks.length > 0 ? 
                               (activeExam.tasks.filter(t => t.completed).length === activeExam.tasks.length ? 
@@ -816,19 +1021,26 @@ const ExamCountdown  = ({ darkMode = true }) => {
                         </div>
                         
                         {activeExam.tasks.length > 0 ? (
-                          <div className="space-y-2">
+                          <motion.div 
+                            variants={containerVariants}
+                            className="space-y-2"
+                          >
                             {activeExam.tasks
                               .filter(task => showCompleted || !task.completed)
-                              .map(task => (
-                                <div 
-                                  key={task.id} 
+                              .map((task, index) => (
+                                <motion.div 
+                                  key={task.id}
+                                  variants={itemVariants}
+                                  whileHover={{ x: 5 }}
                                   className={`p-3 rounded-lg flex items-center ${
                                     darkMode ? 'bg-gray-600' : 'bg-white'
                                   } ${
                                     task.completed ? (darkMode ? 'opacity-70' : 'opacity-80') : ''
-                                  }`}
+                                  } shadow-sm`}
                                 >
-                                  <button
+                                  <motion.button
+                                    whileHover={{ scale: 1.1 }}
+                                    whileTap={{ scale: 0.9 }}
                                     onClick={() => toggleTask(activeExam.id, task.id)}
                                     className={`mr-3 flex-shrink-0 h-5 w-5 rounded flex items-center justify-center ${
                                       task.completed ? 
@@ -837,11 +1049,13 @@ const ExamCountdown  = ({ darkMode = true }) => {
                                     }`}
                                   >
                                     {task.completed && <FiCheck className="text-white" size={14} />}
-                                  </button>
+                                  </motion.button>
                                   <span className={`flex-1 ${task.completed ? 'line-through' : ''}`}>
                                     {task.text}
                                   </span>
-                                  <button
+                                  <motion.button
+                                    whileHover={{ scale: 1.1 }}
+                                    whileTap={{ scale: 0.9 }}
                                     onClick={() => deleteTask(activeExam.id, task.id)}
                                     className={`p-1 rounded-full ml-2 ${
                                       darkMode ? 'hover:bg-gray-500 text-gray-300' : 'hover:bg-gray-200 text-gray-500'
@@ -849,22 +1063,29 @@ const ExamCountdown  = ({ darkMode = true }) => {
                                     aria-label="Delete task"
                                   >
                                     <FiTrash2 size={14} />
-                                  </button>
-                                </div>
+                                  </motion.button>
+                                </motion.div>
                               ))
                             }
-                          </div>
+                          </motion.div>
                         ) : (
-                          <div className={`text-center py-4 rounded-lg ${darkMode ? 'bg-gray-600' : 'bg-white'}`}>
+                          <motion.div 
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            className={`text-center py-4 rounded-lg ${darkMode ? 'bg-gray-600' : 'bg-white'}`}
+                          >
                             <p className={darkMode ? 'text-gray-400' : 'text-gray-500'}>No tasks added yet</p>
-                          </div>
+                          </motion.div>
                         )}
                       </div>
                       
                       <div>
-                        <h4 className="font-semibold text-lg mb-3">Add New Task</h4>
+                        <h4 className="font-semibold text-lg mb-3 flex items-center">
+                          <FiPlus className="mr-2 text-blue-500" /> Add New Task
+                        </h4>
                         <div className="flex space-x-2">
-                          <input
+                          <motion.input
+                            whileFocus={{ scale: 1.01 }}
                             type="text"
                             value={newTask.examId === activeExam.id ? newTask.text : ''}
                             onChange={(e) => setNewTask({
@@ -875,28 +1096,30 @@ const ExamCountdown  = ({ darkMode = true }) => {
                             className={`flex-1 p-3 rounded-lg ${darkMode ? 'bg-gray-600 text-white placeholder-gray-400' : 'bg-white placeholder-gray-500'}`}
                             onKeyPress={(e) => e.key === 'Enter' && addTask()}
                           />
-                          <button
+                          <motion.button
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
                             onClick={addTask}
                             disabled={!newTask.text || newTask.examId !== activeExam.id}
                             className={`px-4 py-3 rounded-lg font-medium transition-colors ${
                               (!newTask.text || newTask.examId !== activeExam.id) ? 
                                 (darkMode ? 'bg-gray-600 text-gray-400 cursor-not-allowed' : 'bg-gray-300 text-gray-500 cursor-not-allowed') : 
-                                (darkMode ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-blue-500 hover:bg-blue-600 text-white')
+                                'bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white'
                             }`}
                           >
                             Add Task
-                          </button>
+                          </motion.button>
                         </div>
                       </div>
                     </>
                   )}
-                </div>
+                </motion.div>
               )}
             </div>
           </div>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 };
 

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { FiArrowLeft, FiThumbsUp, FiMessageSquare, FiSearch, FiPlus, FiChevronDown, FiChevronUp, FiX } from 'react-icons/fi';
-const DiscussionForum  = ({ darkMode = true }) => {
 
+const DiscussionForum = ({ darkMode = true }) => {
   const [topics, setTopics] = useState([
     { 
       id: 1, 
@@ -79,6 +80,42 @@ const DiscussionForum  = ({ darkMode = true }) => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Animation variants
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: { 
+      opacity: 1,
+      transition: { 
+        staggerChildren: 0.1,
+        when: "beforeChildren"
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: {
+        type: "spring",
+        stiffness: 100,
+        damping: 10
+      }
+    }
+  };
+
+  const cardVariants = {
+    hover: {
+      y: -5,
+      boxShadow: darkMode 
+        ? "0 10px 25px -5px rgba(0, 0, 0, 0.5)" 
+        : "0 10px 25px -5px rgba(0, 0, 0, 0.1)",
+      transition: { duration: 0.3 }
+    },
+    tap: { scale: 0.98 }
+  };
 
   const addTopic = () => {
     if (newTopic.title && newTopic.subject && newTopic.content) {
@@ -197,63 +234,87 @@ const DiscussionForum  = ({ darkMode = true }) => {
   };
 
   return (
-<div className={`min-h-screen ${darkMode ? 'bg-gray-900 text-gray-100' : 'bg-gray-50 text-gray-900'} pt-8`}>
-  <div className={`sticky top-0 z-10 ${darkMode ? 'bg-gray-800' : 'bg-white'} shadow-md transition-all duration-300 ${isScrolled ? 'py-2' : 'py-4'}`}>
-    <div className="container mx-auto px-4">
-      <h1 className="text-3xl font-bold flex items-center">
-        <FiMessageSquare className="mr-2" />
-        Peer Study Forum
-      </h1>
-    </div>
-  </div>
-
-  {/* Other page content goes here */}
-
+    <motion.div 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+      className={`min-h-screen ${darkMode ? 'bg-gray-900 text-gray-100' : 'bg-gray-50 text-gray-900'}`}
+    >
+      {/* Animated Header */}
+      <motion.div 
+        className={`sticky top-0 z-10 ${darkMode ? 'bg-gray-800' : 'bg-white'} shadow-md transition-all duration-300 ${isScrolled ? 'py-2' : 'py-4'}`}
+        initial={{ y: -20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.3 }}
+      >
+        <div className="container mx-auto px-4">
+          <motion.h1 
+            initial={{ y: -20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.2 }}
+            className="text-3xl font-bold flex items-center bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent"
+          >
+            <FiMessageSquare className="mr-2" />
+            Peer Study Forum
+          </motion.h1>
+        </div>
+      </motion.div>
 
       <div className="container mx-auto px-4 py-8">
         {!activeTopic ? (
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          <motion.div 
+            className="grid grid-cols-1 lg:grid-cols-4 gap-6"
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+          >
             <div className="lg:col-span-3 order-2 lg:order-1">
-              <div className={`p-6 rounded-xl ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border shadow-sm mb-6`}>
+              <motion.div 
+                variants={itemVariants}
+                className={`p-6 rounded-xl ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border shadow-sm mb-6`}
+              >
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
                   <div className="relative flex-grow">
                     <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                    <input
+                    <motion.input
                       type="text"
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
                       placeholder="Search topics..."
-                      className={`w-full pl-10 pr-4 py-2.5 cursor-pointer rounded-lg border ${darkMode ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' : 'bg-white border-gray-300 placeholder-gray-500'}`}
+                      className={`w-full pl-10 pr-4 py-2.5 rounded-lg border ${darkMode ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' : 'bg-white border-gray-300 placeholder-gray-500'}`}
+                      whileFocus={{ scale: 1.01 }}
                     />
                   </div>
                   <div className="flex gap-2">
                     <div className="relative flex-1 min-w-[120px]">
-                      <select
+                      <motion.select
                         value={selectedSubject}
                         onChange={(e) => setSelectedSubject(e.target.value)}
-                        className={`appearance-none w-full p-2.5 pr-8 rounded-lg border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'} cursor-pointer`}
+                        className={`appearance-none w-full p-2.5 pr-8 rounded-lg border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'}`}
+                        whileHover={{ scale: 1.02 }}
                       >
                         {subjects.map((subject, index) => (
                           <option key={index} value={subject}>
                             {subject === 'all' ? 'All Subjects' : subject}
                           </option>
                         ))}
-                      </select>
+                      </motion.select>
                       <div className={`absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                         <FiChevronDown />
                       </div>
                     </div>
                     <div className="relative flex-1 min-w-[140px]">
-                      <select
+                      <motion.select
                         value={sortBy}
                         onChange={(e) => setSortBy(e.target.value)}
-                        className={`appearance-none w-full p-2.5 pr-8 rounded-lg border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'} cursor-pointer`}
+                        className={`appearance-none w-full p-2.5 pr-8 rounded-lg border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'}`}
+                        whileHover={{ scale: 1.02 }}
                       >
                         <option value="newest">Newest First</option>
                         <option value="oldest">Oldest First</option>
                         <option value="most-upvotes">Most Upvotes</option>
                         <option value="most-replies">Most Replies</option>
-                      </select>
+                      </motion.select>
                       <div className={`absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                         <FiChevronDown />
                       </div>
@@ -262,11 +323,18 @@ const DiscussionForum  = ({ darkMode = true }) => {
                 </div>
 
                 {sortedTopics.length > 0 ? (
-                  <div className="space-y-4">
+                  <motion.div 
+                    className="space-y-4"
+                    variants={containerVariants}
+                  >
                     {sortedTopics.map(topic => (
-                      <div 
+                      <motion.div 
                         key={topic.id} 
-                        className={`p-5 rounded-xl transition-all hover:shadow-md ${darkMode ? 'bg-gray-700 hover:bg-gray-600 border-gray-600' : 'bg-white hover:bg-gray-50 border-gray-200'} border cursor-pointer`}
+                        variants={itemVariants}
+                        whileHover="hover"
+                        whileTap="tap"
+                        variants={cardVariants}
+                        className={`p-5 rounded-xl transition-all ${darkMode ? 'bg-gray-700 hover:bg-gray-600 border-gray-600' : 'bg-white hover:bg-gray-50 border-gray-200'} border cursor-pointer`}
                         onClick={() => {
                           setActiveTopic(topic);
                           setTopics(topics.map(t => 
@@ -282,12 +350,13 @@ const DiscussionForum  = ({ darkMode = true }) => {
                                 {topic.subject}
                               </span>
                               {topic.tags.map((tag, index) => (
-                                <span 
+                                <motion.span 
                                   key={index} 
                                   className={`px-2 py-1 rounded-full text-xs ${darkMode ? 'bg-gray-600 text-gray-300' : 'bg-gray-100 text-gray-600'}`}
+                                  whileHover={{ scale: 1.05 }}
                                 >
                                   #{tag}
-                                </span>
+                                </motion.span>
                               ))}
                             </div>
                             <p className={`text-sm line-clamp-2 mb-3 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
@@ -295,16 +364,18 @@ const DiscussionForum  = ({ darkMode = true }) => {
                             </p>
                           </div>
                           <div className="flex flex-col items-center">
-                            <button
+                            <motion.button
                               onClick={(e) => {
                                 e.stopPropagation();
                                 upvoteTopic(topic.id);
                               }}
-                              className={`flex flex-col cursor-pointer items-center p-2 rounded-full transition-colors ${darkMode ? 'hover:bg-gray-600' : 'hover:bg-gray-200'}`}
+                              className={`flex flex-col items-center p-2 rounded-full transition-colors ${darkMode ? 'hover:bg-gray-600' : 'hover:bg-gray-200'}`}
+                              whileHover={{ scale: 1.1 }}
+                              whileTap={{ scale: 0.9 }}
                             >
                               <FiThumbsUp className={darkMode ? 'text-blue-400' : 'text-blue-500'} />
                               <span className="text-xs mt-1">{topic.upvotes}</span>
-                            </button>
+                            </motion.button>
                           </div>
                         </div>
                         
@@ -325,22 +396,38 @@ const DiscussionForum  = ({ darkMode = true }) => {
                             <span>👁️ {topic.views}</span>
                           </div>
                         </div>
-                      </div>
+                      </motion.div>
                     ))}
-                  </div>
+                  </motion.div>
                 ) : (
-                  <div className={`text-center py-10 rounded-lg ${darkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.3 }}
+                    className={`text-center py-10 rounded-lg ${darkMode ? 'bg-gray-700' : 'bg-gray-100'}`}
+                  >
                     <p className="text-lg mb-2">No discussion topics found</p>
                     <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                       Try adjusting your search or create a new topic
                     </p>
-                  </div>
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => setNewTopic({ title: '', subject: '', content: '', tags: [] })}
+                      className={`mt-3 px-4 py-2 rounded-lg ${darkMode ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'} text-white text-sm`}
+                    >
+                      Create Your First Topic
+                    </motion.button>
+                  </motion.div>
                 )}
-              </div>
+              </motion.div>
             </div>
             
             <div className="lg:col-span-1 order-1 lg:order-2">
-              <div className={`sticky top-24 p-6 rounded-xl ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border shadow-sm`}>
+              <motion.div 
+                variants={itemVariants}
+                className={`sticky top-24 p-6 rounded-xl ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border shadow-sm`}
+              >
                 <h3 className="font-semibold text-lg mb-4 flex items-center">
                   <FiPlus className="mr-2" />
                   Start New Topic
@@ -350,12 +437,13 @@ const DiscussionForum  = ({ darkMode = true }) => {
                     <label className={`block text-sm mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
                       Title
                     </label>
-                    <input
+                    <motion.input
                       type="text"
                       value={newTopic.title}
                       onChange={(e) => setNewTopic({...newTopic, title: e.target.value})}
                       placeholder="Enter topic title"
-                      className={`w-full p-2.5 cursor-pointer rounded-lg border ${darkMode ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' : 'bg-white border-gray-300 placeholder-gray-500'}`}
+                      className={`w-full p-2.5 rounded-lg border ${darkMode ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' : 'bg-white border-gray-300 placeholder-gray-500'}`}
+                      whileFocus={{ scale: 1.01 }}
                     />
                   </div>
                   
@@ -364,17 +452,18 @@ const DiscussionForum  = ({ darkMode = true }) => {
                       Subject
                     </label>
                     <div className="relative">
-                      <select
+                      <motion.select
                         value={newTopic.subject}
                         onChange={(e) => setNewTopic({...newTopic, subject: e.target.value})}
-                        className={`appearance-none w-full p-2.5 pr-8 rounded-lg border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'} cursor-pointer`}
+                        className={`appearance-none w-full p-2.5 pr-8 rounded-lg border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'}`}
+                        whileHover={{ scale: 1.01 }}
                       >
                         <option value="">Select subject</option>
                         {subjects.filter(s => s !== 'all').map((subject, index) => (
                           <option key={index} value={subject}>{subject}</option>
                         ))}
                         <option value="new">+ Add new subject</option>
-                      </select>
+                      </motion.select>
                       <div className={`absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                         <FiChevronDown />
                       </div>
@@ -386,120 +475,160 @@ const DiscussionForum  = ({ darkMode = true }) => {
                       <label className={`block text-sm mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
                         New Subject
                       </label>
-                      <input
+                      <motion.input
                         type="text"
                         onChange={(e) => setNewTopic({...newTopic, subject: e.target.value})}
                         placeholder="Enter new subject"
                         className={`w-full p-2.5 rounded-lg border ${darkMode ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' : 'bg-white border-gray-300 placeholder-gray-500'}`}
+                        whileFocus={{ scale: 1.01 }}
                       />
                     </div>
                   )}
                   
-                 <div>
-  <label className={`block text-sm mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-    Tags
-  </label>
-  <div className={`p-2 rounded-lg border ${darkMode ? 'bg-gray-700 border-gray-600' : 'bg-white border-gray-300'}`}>
-    <div className="flex flex-wrap gap-2 mb-2 min-h-[40px]">
-      {newTopic.tags.map((tag, index) => (
-        <div 
-          key={index} 
-          className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs ${darkMode ? 'bg-gray-600 text-gray-200' : 'bg-gray-200 text-gray-700'}`}
-        >
-          #{tag}
-          <button 
-            onClick={() => removeTag(tag)}
-            className="ml-1.5 cursor-pointer hover:text-red-400"
-            type="button"
-          >
-            <FiX size={12} />
-          </button>
-        </div>
-      ))}
-    </div>
+                  <div>
+                    <label className={`block text-sm mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                      Tags
+                    </label>
+                    <div className={`p-2 rounded-lg border ${darkMode ? 'bg-gray-700 border-gray-600' : 'bg-white border-gray-300'}`}>
+                      <div className="flex flex-wrap gap-2 mb-2 min-h-[40px]">
+                        {newTopic.tags.map((tag, index) => (
+                          <motion.div 
+                            key={index} 
+                            className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs ${darkMode ? 'bg-gray-600 text-gray-200' : 'bg-gray-200 text-gray-700'}`}
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            exit={{ scale: 0 }}
+                          >
+                            #{tag}
+                            <motion.button 
+                              onClick={() => removeTag(tag)}
+                              className="ml-1.5 cursor-pointer hover:text-red-400"
+                              type="button"
+                              whileHover={{ scale: 1.2 }}
+                              whileTap={{ scale: 0.9 }}
+                            >
+                              <FiX size={12} />
+                            </motion.button>
+                          </motion.div>
+                        ))}
+                      </div>
 
-    {showTagInput ? (
-      <div className="flex items-center gap-2">
-        <input
-          type="text"
-          value={newTag}
-          onChange={(e) => setNewTag(e.target.value)}
-          placeholder="Add tag..."
-          className={`flex-grow p-2 w-full h-full box-border overflow-hiddenrounded-lg border
-          ${darkMode ? 'bg-gray-600 border-gray-500 text-white' : 'bg-white border-gray-300'}`}
-          onKeyPress={(e) => e.key === 'Enter' && addTag()}
-          autoFocus
-        />
-       
-      </div>
-    ) : (
-      <button
-        onClick={() => setShowTagInput(true)}
-        className={`text-sm cursor-pointer flex items-center ${darkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-800'}`}
-        type="button"
-      >
-        <FiPlus className="mr-1" />
-        Add tag
-      </button>
-    )}
-  </div>
-</div>
+                      {showTagInput ? (
+                        <motion.div 
+                          className="flex items-center gap-2"
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: 'auto' }}
+                          exit={{ opacity: 0, height: 0 }}
+                        >
+                          <input
+                            type="text"
+                            value={newTag}
+                            onChange={(e) => setNewTag(e.target.value)}
+                            placeholder="Add tag..."
+                            className={`flex-grow p-2 rounded-lg border ${darkMode ? 'bg-gray-600 border-gray-500 text-white' : 'bg-white border-gray-300'}`}
+                            onKeyPress={(e) => e.key === 'Enter' && addTag()}
+                            autoFocus
+                          />
+                          <motion.button
+                            onClick={addTag}
+                            className={`p-2 rounded-full ${darkMode ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'} text-white`}
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
+                          >
+                            <FiPlus />
+                          </motion.button>
+                        </motion.div>
+                      ) : (
+                        <motion.button
+                          onClick={() => setShowTagInput(true)}
+                          className={`text-sm flex items-center ${darkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-800'}`}
+                          type="button"
+                          whileHover={{ x: 2 }}
+                        >
+                          <FiPlus className="mr-1" />
+                          Add tag
+                        </motion.button>
+                      )}
+                    </div>
+                  </div>
                   
                   <div>
                     <label className={`block text-sm mb-1.5 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
                       Content
                     </label>
-                    <textarea
+                    <motion.textarea
                       value={newTopic.content}
                       onChange={(e) => setNewTopic({...newTopic, content: e.target.value})}
                       placeholder="Your question or discussion topic (markdown supported)"
-                      className={`w-full p-2.5 cursor-pointer rounded-lg border ${darkMode ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' : 'bg-white border-gray-300 placeholder-gray-500'}`}
+                      className={`w-full p-2.5 rounded-lg border ${darkMode ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' : 'bg-white border-gray-300 placeholder-gray-500'}`}
                       rows="5"
+                      whileFocus={{ scale: 1.01 }}
                     />
                   </div>
                   
-                <button
-                  onClick={addTopic}
-                  disabled={!newTopic.title || !newTopic.subject || !newTopic.content}
-                  className={`w-full py-2.5 cursor-pointer rounded-lg font-bolder bg-gray-500 hover:bg-gray-600 text-lg transition-all ${
-                    (!newTopic.title || !newTopic.subject || !newTopic.content)
-                      ? (darkMode ? 'bg-gray-600 cursor-not-allowed' : 'bg-gray-300 cursor-not-allowed')
-                      : (darkMode ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600')
-                  } text-white shadow-md`}
-                >
-                  Post Topic
-                </button>
-
+                  <motion.button
+                    onClick={addTopic}
+                    disabled={!newTopic.title || !newTopic.subject || !newTopic.content}
+                    className={`w-full py-2.5 rounded-lg font-medium text-lg transition-all ${
+                      (!newTopic.title || !newTopic.subject || !newTopic.content)
+                        ? (darkMode ? 'bg-gray-600 cursor-not-allowed' : 'bg-gray-300 cursor-not-allowed')
+                        : (darkMode ? 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700' : 'bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600')
+                    } text-white shadow-md`}
+                    whileHover={{ 
+                      scale: (!newTopic.title || !newTopic.subject || !newTopic.content) ? 1 : 1.02,
+                      boxShadow: (!newTopic.title || !newTopic.subject || !newTopic.content) ? 'none' : '0 4px 12px rgba(59, 130, 246, 0.3)'
+                    }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    Post Topic
+                  </motion.button>
                 </div>
-              </div>
+              </motion.div>
 
-              <div className={`mt-4 p-6 rounded-xl ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border shadow-sm`}>
+              <motion.div 
+                variants={itemVariants}
+                className={`mt-4 p-6 rounded-xl ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border shadow-sm`}
+              >
                 <h3 className="font-semibold text-lg mb-3">Popular Tags</h3>
                 <div className="flex flex-wrap gap-2">
                   {allTags.slice(0, 15).map((tag, index) => (
-                    <span 
+                    <motion.span 
                       key={index} 
                       className={`px-2.5 py-1 rounded-full text-xs cursor-pointer transition-colors ${darkMode ? 'bg-gray-700 hover:bg-gray-600 text-blue-400' : 'bg-gray-200 hover:bg-gray-300 text-blue-600'}`}
                       onClick={() => setSearchTerm(tag)}
+                      whileHover={{ y: -2 }}
+                      whileTap={{ scale: 0.95 }}
                     >
                       #{tag}
-                    </span>
+                    </motion.span>
                   ))}
                 </div>
-              </div>
+              </motion.div>
             </div>
-          </div>
+          </motion.div>
         ) : (
-          <div className="max-w-4xl mx-auto">
-            <button
+          <motion.div 
+            className="max-w-4xl mx-auto"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3 }}
+          >
+            <motion.button
               onClick={() => setActiveTopic(null)}
-              className={`mb-6 px-4 py-2 rounded-lg cursor-pointer flex items-center transition-colors ${darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'} shadow-sm`}
+              className={`mb-6 px-4 py-2 rounded-lg flex items-center transition-colors ${darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-200 hover:bg-gray-300'} shadow-sm`}
+              whileHover={{ x: -5 }}
+              whileTap={{ scale: 0.95 }}
             >
               <FiArrowLeft className="mr-2" />
               Back to topics
-            </button>
+            </motion.button>
             
-            <div className={`p-6 rounded-xl ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border shadow-sm mb-6`}>
+            <motion.div 
+              className={`p-6 rounded-xl ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} border shadow-sm mb-6`}
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.2 }}
+            >
               <div className="flex justify-between items-start mb-4">
                 <div>
                   <h2 className="font-bold text-2xl mb-2">{activeTopic.title}</h2>
@@ -508,19 +637,25 @@ const DiscussionForum  = ({ darkMode = true }) => {
                       {activeTopic.subject}
                     </span>
                     {activeTopic.tags.map((tag, index) => (
-                      <span key={index} className={`px-2 py-1 rounded-full text-xs ${darkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-200 text-gray-600'}`}>
+                      <motion.span 
+                        key={index} 
+                        className={`px-2 py-1 rounded-full text-xs ${darkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-200 text-gray-600'}`}
+                        whileHover={{ scale: 1.05 }}
+                      >
                         #{tag}
-                      </span>
+                      </motion.span>
                     ))}
                   </div>
                 </div>
-                <button
+                <motion.button
                   onClick={() => upvoteTopic(activeTopic.id)}
-                  className={`flex flex-col items-center p-2 rounded-full cursor-pointer transition-colors ${darkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-200'}`}
+                  className={`flex flex-col items-center p-2 rounded-full transition-colors ${darkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-200'}`}
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
                 >
                   <FiThumbsUp size={20} className={darkMode ? 'text-blue-400' : 'text-blue-500'} />
-                  <span className="text-sm cursor-pointer mt-1">{activeTopic.upvotes}</span>
-                </button>
+                  <span className="text-sm mt-1">{activeTopic.upvotes}</span>
+                </motion.button>
               </div>
               
               <div className={`flex items-center text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'} mb-6`}>
@@ -545,13 +680,14 @@ const DiscussionForum  = ({ darkMode = true }) => {
                 <div className="flex items-center gap-2">
                   <span className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Sort by:</span>
                   <div className="relative">
-                    <select
-                      className={`appearance-none p-1.5 pr-6 rounded border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'} cursor-pointer text-sm`}
+                    <motion.select
+                      className={`appearance-none p-1.5 pr-6 rounded border ${darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300'} text-sm`}
+                      whileHover={{ scale: 1.02 }}
                     >
                       <option>Newest</option>
                       <option>Oldest</option>
                       <option>Most Upvoted</option>
-                    </select>
+                    </motion.select>
                     <div className={`absolute right-1.5 top-1/2 transform -translate-y-1/2 pointer-events-none ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                       <FiChevronDown size={14} />
                     </div>
@@ -560,10 +696,14 @@ const DiscussionForum  = ({ darkMode = true }) => {
               </div>
               
               {activeTopic.replies.length > 0 ? (
-                <div className="space-y-4">
+                <motion.div 
+                  className="space-y-4"
+                  variants={containerVariants}
+                >
                   {activeTopic.replies.map(reply => (
-                    <div 
+                    <motion.div 
                       key={reply.id} 
+                      variants={itemVariants}
                       className={`p-4 rounded-lg ${darkMode ? 'bg-gray-700 border-gray-600' : 'bg-white border-gray-200'} border`}
                     >
                       <div className="flex justify-between items-start mb-2">
@@ -575,22 +715,25 @@ const DiscussionForum  = ({ darkMode = true }) => {
                           <span className={`mx-2 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>•</span>
                           <span className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>{reply.date}</span>
                         </div>
-                        <button
+                        <motion.button
                           onClick={() => upvoteReply(activeTopic.id, reply.id)}
-                          className={`flex items-center cursor-pointer gap-1 px-2 py-1 rounded transition-colors ${darkMode ? 'hover:bg-gray-600' : 'hover:bg-gray-200'}`}
+                          className={`flex items-center gap-1 px-2 py-1 rounded transition-colors ${darkMode ? 'hover:bg-gray-600' : 'hover:bg-gray-200'}`}
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
                         >
                           <FiThumbsUp size={16} className={darkMode ? 'text-blue-400' : 'text-blue-500'} />
                           <span className="text-sm">{reply.upvotes}</span>
-                        </button>
+                        </motion.button>
                       </div>
                       <div className="pl-8">
                         <p className={`whitespace-pre-line ${expandedReplies[reply.id] ? '' : 'line-clamp-3'} ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                           {reply.content}
                         </p>
                         {reply.content.length > 200 && (
-                          <button
+                          <motion.button
                             onClick={() => toggleReplyExpansion(reply.id)}
-                            className={`text-sm cursor-pointer mt-1 flex items-center ${darkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-800'}`}
+                            className={`text-sm mt-1 flex items-center ${darkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-800'}`}
+                            whileHover={{ x: 2 }}
                           >
                             {expandedReplies[reply.id] ? (
                               <>
@@ -603,24 +746,28 @@ const DiscussionForum  = ({ darkMode = true }) => {
                                 Show more
                               </>
                             )}
-                          </button>
+                          </motion.button>
                         )}
                       </div>
-                    </div>
+                    </motion.div>
                   ))}
-                </div>
+                </motion.div>
               ) : (
-                <div className={`text-center py-8 rounded-lg ${darkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className={`text-center py-8 rounded-lg ${darkMode ? 'bg-gray-700' : 'bg-gray-100'}`}
+                >
                   <p className="mb-2">No replies yet</p>
                   <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                     Be the first to reply to this topic
                   </p>
-                </div>
+                </motion.div>
               )}
               
               <div className="mt-8">
                 <h4 className="font-semibold text-lg mb-4">Post Your Reply</h4>
-                <textarea
+                <motion.textarea
                   value={newReply.topicId === activeTopic.id ? newReply.content : ''}
                   onChange={(e) => setNewReply({
                     content: e.target.value,
@@ -629,38 +776,51 @@ const DiscussionForum  = ({ darkMode = true }) => {
                   placeholder="Write your reply here... (markdown supported)"
                   className={`w-full p-3 rounded-lg border ${darkMode ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' : 'bg-white border-gray-300 placeholder-gray-500'}`}
                   rows="5"
+                  whileFocus={{ scale: 1.01 }}
                 />
                 <div className="flex justify-between items-center mt-3">
                   <div className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                     Tip: You can use markdown for formatting
                   </div>
-                  <button
+                  <motion.button
                     onClick={addReply}
                     disabled={!newReply.content || newReply.topicId !== activeTopic.id}
-                    className={`px-6 py-2.5 cursor-pointer rounded-lg font-medium shadow-md ${
+                    className={`px-6 py-2.5 rounded-lg font-medium shadow-md ${
                       (!newReply.content || newReply.topicId !== activeTopic.id) ? 
                       (darkMode ? 'bg-gray-600 cursor-not-allowed' : 'bg-gray-300 cursor-not-allowed') : 
                       (darkMode ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600')
                     } text-white`}
+                    whileHover={{ 
+                      scale: (!newReply.content || newReply.topicId !== activeTopic.id) ? 1 : 1.05,
+                      boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)'
+                    }}
+                    whileTap={{ scale: 0.95 }}
                   >
                     Post Reply
-                  </button>
+                  </motion.button>
                 </div>
               </div>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         )}
       </div>
 
-      {isScrolled && (
-        <button
-          onClick={scrollToTop}
-          className={`fixed bottom-6 right-6 p-3 cursor-pointer rounded-full shadow-lg transition-all ${darkMode ? 'bg-gray-700 hover:bg-gray-600 text-blue-400' : 'bg-white hover:bg-gray-100 text-blue-600'}`}
-        >
-          ↑
-        </button>
-      )}
-    </div>
+      <AnimatePresence>
+        {isScrolled && (
+          <motion.button
+            onClick={scrollToTop}
+            className={`fixed bottom-6 right-6 p-3 rounded-full shadow-lg ${darkMode ? 'bg-gray-700 hover:bg-gray-600 text-blue-400' : 'bg-white hover:bg-gray-100 text-blue-600'}`}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+          >
+            ↑
+          </motion.button>
+        )}
+      </AnimatePresence>
+    </motion.div>
   );
 };
 

@@ -1,7 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { FiBook, FiCheck, FiX, FiRotateCcw, FiInfo, FiAward, FiClock, FiBarChart2 } from 'react-icons/fi';
-const ReadingTrainer  = ({ darkMode = true }) => {
+import { 
+  FiBook, 
+  FiCheck, 
+  FiX, 
+  FiRotateCcw, 
+  FiInfo, 
+  FiAward, 
+  FiClock, 
+  FiBarChart2,
+  FiChevronRight,
+  FiAlertCircle,
+  FiBookmark,
+  FiHelpCircle
+} from 'react-icons/fi';
+import { motion, AnimatePresence } from 'framer-motion';
 
+const ReadingTrainer = ({ darkMode = true }) => {
   const passages = [
     {
       id: 1,
@@ -33,7 +47,9 @@ const ReadingTrainer  = ({ darkMode = true }) => {
           explanation: 'Sleep shows decreased reactivity to stimuli compared to wakefulness, but not complete unresponsiveness like in a coma.'
         }
       ],
-      readingTime: 2 // in minutes
+      readingTime: 2,
+      icon: '🌙',
+      color: 'bg-indigo-500'
     },
     {
       id: 2,
@@ -77,7 +93,9 @@ const ReadingTrainer  = ({ darkMode = true }) => {
           explanation: 'Photoautotrophs include plants, algae, and cyanobacteria.'
         }
       ],
-      readingTime: 3 // in minutes
+      readingTime: 3,
+      icon: '🌿',
+      color: 'bg-green-500'
     },
     {
       id: 3,
@@ -109,7 +127,9 @@ const ReadingTrainer  = ({ darkMode = true }) => {
           explanation: 'Textiles led in employment, output value, and capital investment.'
         }
       ],
-      readingTime: 2 // in minutes
+      readingTime: 2,
+      icon: '🏭',
+      color: 'bg-amber-500'
     }
   ];
   
@@ -126,6 +146,7 @@ const ReadingTrainer  = ({ darkMode = true }) => {
   });
   const [showWordModal, setShowWordModal] = useState(false);
   const [currentWord, setCurrentWord] = useState('');
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   // Timer effect
   useEffect(() => {
@@ -208,7 +229,7 @@ const ReadingTrainer  = ({ darkMode = true }) => {
 
   const handleWordClick = (e) => {
     const word = e.target.innerText.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, '');
-    if (word.length > 8 || /[A-Z]/.test(word)) { // Long words or proper nouns
+    if (word.length > 8 || /[A-Z]/.test(word)) {
       highlightWord(word);
     }
   };
@@ -220,302 +241,519 @@ const ReadingTrainer  = ({ darkMode = true }) => {
     return { message: 'Keep practicing!', color: 'text-red-500' };
   };
 
+  // Animation variants
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: { 
+      opacity: 1,
+      transition: { staggerChildren: 0.1 }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: { duration: 0.5 }
+    }
+  };
+
+  const sidebarVariants = {
+    open: { 
+      x: 0,
+      opacity: 1,
+      transition: { type: 'spring', stiffness: 300, damping: 30 }
+    },
+    closed: { 
+      x: -300,
+      opacity: 0,
+      transition: { type: 'spring', stiffness: 300, damping: 30 }
+    }
+  };
+
   return (
-    <div className={`p-6 rounded-lg transition-colors duration-300 ${darkMode ? 'bg-gray-800 text-gray-100' : 'bg-white text-gray-800'} pt-9 shadow-xl`}>
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-3xl font-bold flex items-center">
-          <FiBook className="mr-2" /> Reading Comprehension Trainer
-        </h2>
-        <div className={`flex items-center px-3 py-1 rounded-full ${darkMode ? 'bg-gray-700' : 'bg-gray-200'}`}>
-          <FiBarChart2 className="mr-1" />
-          <span className="text-sm font-medium">Attempts: {stats.attempts}</span>
-        </div>
-      </div>
-      
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left sidebar */}
-        <div className="lg:col-span-1 space-y-4">
-          <div className={`p-4 rounded-lg transition-colors duration-300 ${darkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
-            <h3 className="font-semibold mb-3 flex items-center">
-              <FiBook className="mr-2" /> Select Passage
-            </h3>
-            <div className="space-y-2">
-              {passages.map(passage => (
-                <button
-                  key={passage.id}
-                  onClick={() => selectPassage(passage)}
-                  className={`w-full text-left p-3 cursor-pointer rounded transition-colors duration-200 flex justify-between items-center ${
-                    activePassage.id === passage.id ? 
-                    (darkMode ? 'bg-blue-600 text-white' : 'bg-blue-500 text-white') : 
-                    (darkMode ? 'bg-gray-600 hover:bg-gray-500' : 'bg-white hover:bg-gray-200')
-                  }`}
-                >
-                  <span>{passage.title}</span>
-                  <span className="text-xs cursor-pointer opacity-80">{passage.questions.length} Qs</span>
-                </button>
-              ))}
-            </div>
-          </div>
+    <div className={`min-h-screen p-4 md:p-6 transition-colors duration-500 ${darkMode ? 'bg-gray-900 text-gray-100' : 'bg-gray-50 text-gray-800'}`}>
+      <motion.div 
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className={`max-w-7xl mx-auto rounded-xl shadow-2xl overflow-hidden ${darkMode ? 'bg-gray-800' : 'bg-white'}`}
+      >
+        {/* Header */}
+        <div className={`p-6 ${darkMode ? 'bg-gray-700' : 'bg-gray-100'} flex items-center justify-between`}>
+          <motion.div 
+            initial={{ x: -20 }}
+            animate={{ x: 0 }}
+            transition={{ delay: 0.2 }}
+            className="flex items-center"
+          >
+            <FiBook className={`text-3xl mr-3 ${activePassage.color.replace('bg-', 'text-')}`} />
+            <h1 className="text-2xl md:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-600">
+              Reading Comprehension Trainer
+            </h1>
+          </motion.div>
           
-          {/* Reading timer */}
-          <div className={`p-4 rounded-lg transition-colors duration-300 ${darkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
-            <h3 className="font-semibold mb-3 flex items-center">
-              <FiClock className="mr-2" /> Reading Timer
-            </h3>
-            <div className="flex items-center justify-between">
-              <div className="text-2xl font-mono">
-                {formatTime(readingTimeLeft)}
-              </div>
-              {!timerActive && readingTimeLeft === activePassage.readingTime * 60 && (
-                <button
-                  onClick={startTimer}
-                  className={`px-3 py-1 cursor-pointer rounded ${darkMode ? 'bg-green-600 hover:bg-green-700' : 'bg-green-500 hover:bg-green-600'} text-white text-sm`}
-                >
-                  Start
-                </button>
-              )}
-              {timerActive && (
-                <button
-                  onClick={() => setTimerActive(false)}
-                  className={`px-3 py-1 cursor-pointer rounded ${darkMode ? 'bg-red-600 hover:bg-red-700' : 'bg-red-500 hover:bg-red-600'} text-white text-sm`}
-                >
-                  Pause
-                </button>
-              )}
-            </div>
-            <div className="mt-2 text-sm opacity-80">
-              Suggested time: {activePassage.readingTime} min
-            </div>
-          </div>
-          
-          {/* Difficult words */}
-          {difficultWords.length > 0 && (
-            <div className={`p-4 rounded-lg transition-colors duration-300 ${darkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
-              <h3 className="font-semibold mb-3 flex items-center">
-                <FiInfo className="mr-2" /> Vocabulary Builder
-              </h3>
-              <div className="flex flex-wrap gap-2">
-                {difficultWords.map((word, index) => (
-                  <span 
-                    key={index} 
-                    onClick={() => highlightWord(word)}
-                    className={`px-2 py-1 rounded cursor-pointer text-sm transition-colors duration-200 ${
-                      darkMode ? 'bg-gray-600 hover:bg-gray-500' : 'bg-gray-200 hover:bg-gray-300'
-                    }`}
-                  >
-                    {word}
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
-          
-          {/* Statistics */}
-          <div className={`p-4 rounded-lg transition-colors duration-300 ${darkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
-            <h3 className="font-semibold mb-3 flex items-center">
-              <FiAward className="mr-2" /> Your Stats
-            </h3>
-            <div className="space-y-2">
-              <div className="flex justify-between">
-                <span>Highest Score:</span>
-                <span className="font-medium">{stats.highestScore}%</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Average Score:</span>
-                <span className="font-medium">{stats.averageScore}%</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Passages Read:</span>
-                <span className="font-medium">{stats.attempts}</span>
-              </div>
-            </div>
-          </div>
+          <button 
+            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+            className={`p-2 rounded-full ${darkMode ? 'hover:bg-gray-600' : 'hover:bg-gray-200'} lg:hidden`}
+          >
+            <FiChevronRight className={`text-xl transition-transform ${isSidebarOpen ? 'rotate-180' : ''}`} />
+          </button>
         </div>
         
-        {/* Main content */}
-        <div className="lg:col-span-2 space-y-4">
-          {/* Passage */}
-          <div className={`p-6 rounded-lg transition-colors duration-300 ${darkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
-            <div className="flex justify-between items-start mb-4">
-              <h3 className="font-semibold text-xl">{activePassage.title}</h3>
-              <div className={`px-2 py-1 rounded-full text-xs ${darkMode ? 'bg-gray-600' : 'bg-gray-200'}`}>
-                {activePassage.questions.length} questions
-              </div>
-            </div>
-            <div 
-              className={`prose max-w-none mb-4 leading-relaxed ${darkMode ? 'prose-invert' : ''}`}
-              onClick={(e) => {
-                if (e.target.tagName === 'SPAN') {
-                  handleWordClick(e);
-                }
-              }}
-              dangerouslySetInnerHTML={{ 
-                __html: activePassage.content.split(' ').map(word => {
-                  const cleanWord = word.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, '');
-                  const isDifficult = difficultWords.includes(cleanWord);
-                  return isDifficult ? 
-                    `<span class="${darkMode ? 'text-yellow-300 cursor-help' : 'text-yellow-600 cursor-help'}" style="border-bottom: 1px dotted ${darkMode ? '#d1d5db' : '#4b5563'}">${word}</span>` : 
-                    word + ' ';
-                }).join(' ')
-              }}
-            />
-          </div>
-          
-          {/* Questions */}
-          <div className={`p-6 rounded-lg transition-colors duration-300 ${darkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="font-semibold text-xl flex items-center">
-                <FiCheck className="mr-2" /> Comprehension Questions
-              </h3>
-              <div className={`px-2 py-1 rounded-full text-xs ${darkMode ? 'bg-gray-600' : 'bg-gray-200'}`}>
-                {Object.keys(answers).length}/{activePassage.questions.length} answered
-              </div>
-            </div>
-            
-            <div className="space-y-4">
-              {activePassage.questions.map(question => (
-                <div 
-                  key={question.id} 
-                  className={`p-4 rounded transition-colors duration-200 ${
-                    darkMode ? 'bg-gray-600' : 'bg-white'
-                  } border ${
-                    darkMode ? 'border-gray-500' : 'border-gray-200'
-                  }`}
-                >
-                  <p className="font-medium mb-3">{question.text}</p>
-                  
-                  <div className="space-y-2">
-                    {question.options.map((option, index) => {
-                      const isSelected = answers[question.id] === index;
-                      const isCorrect = index === question.correctAnswer;
-                      const showCorrect = showResults && isCorrect;
-                      const showIncorrect = showResults && isSelected && !isCorrect;
-                      
-                      return (
-                        <label 
-                          key={index} 
-                          className={`flex items-center p-3 rounded cursor-pointer transition-colors duration-200 ${
-                            showCorrect ? (darkMode ? 'bg-green-800' : 'bg-green-100 border-green-300') :
-                            showIncorrect ? (darkMode ? 'bg-red-800' : 'bg-red-100 border-red-300') :
-                            isSelected ? (darkMode ? 'bg-blue-700' : 'bg-blue-100 border-blue-300') :
-                            darkMode ? 'hover:bg-gray-500' : 'hover:bg-gray-100'
-                          } border`}
-                        >
-                          <input
-                            type="radio"
-                            name={`question-${question.id}`}
-                            checked={isSelected}
-                            onChange={() => handleAnswer(question.id, index)}
-                            disabled={showResults}
-                            className="mr-3 h-4 w-4"
-                          />
-                          <span className="flex-1">{option}</span>
-                          {showCorrect && <FiCheck className="ml-2 text-green-500" />}
-                          {showIncorrect && <FiX className="ml-2 text-red-500" />}
-                        </label>
-                      );
-                    })}
-                  </div>
-                  
-                  {showResults && (
-                    <div className={`mt-3 p-3 rounded text-sm ${
-                      darkMode ? 'bg-gray-500' : 'bg-gray-100'
-                    }`}>
-                      <p className="font-medium">Explanation:</p>
-                      <p>{question.explanation}</p>
+        <div className="flex flex-col lg:flex-row">
+          {/* Sidebar - animated for mobile */}
+          <AnimatePresence>
+            {(isSidebarOpen || window.innerWidth >= 1024) && (
+              <motion.div
+                variants={sidebarVariants}
+                initial="closed"
+                animate="open"
+                exit="closed"
+                className={`w-full lg:w-80 flex-shrink-0 ${darkMode ? 'bg-gray-700' : 'bg-gray-50'} p-4 border-r ${darkMode ? 'border-gray-600' : 'border-gray-200'}`}
+              >
+                <motion.div variants={containerVariants} initial="hidden" animate="visible" className="space-y-6">
+                  {/* Passage Selection */}
+                  <motion.div 
+                    variants={itemVariants}
+                    className={`p-5 rounded-xl ${darkMode ? 'bg-gray-600' : 'bg-white'} shadow-md`}
+                  >
+                    <div className="flex items-center mb-4">
+                      <div className={`p-2 rounded-lg ${activePassage.color} text-white mr-3`}>
+                        <FiBookmark className="text-xl" />
+                      </div>
+                      <h3 className="font-semibold text-lg">Select Passage</h3>
                     </div>
+                    <div className="space-y-3">
+                      {passages.map(passage => (
+                        <motion.button
+                          key={passage.id}
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                          onClick={() => selectPassage(passage)}
+                          className={`w-full text-left p-4 rounded-lg transition-all duration-300 flex items-center ${
+                            activePassage.id === passage.id ? 
+                            `${passage.color} text-white shadow-md` : 
+                            (darkMode ? 'bg-gray-500 hover:bg-gray-400' : 'bg-gray-100 hover:bg-gray-200')
+                          }`}
+                        >
+                          <span className="text-xl mr-3">{passage.icon}</span>
+                          <div className="flex-1">
+                            <p className="font-medium">{passage.title}</p>
+                            <p className="text-xs opacity-80">{passage.questions.length} questions</p>
+                          </div>
+                          {activePassage.id === passage.id && (
+                            <motion.div 
+                              initial={{ scale: 0 }}
+                              animate={{ scale: 1 }}
+                              className="w-2 h-2 rounded-full bg-white"
+                            />
+                          )}
+                        </motion.button>
+                      ))}
+                    </div>
+                  </motion.div>
+                  
+                  {/* Timer */}
+                  <motion.div 
+                    variants={itemVariants}
+                    className={`p-5 rounded-xl ${darkMode ? 'bg-gray-600' : 'bg-white'} shadow-md`}
+                  >
+                    <div className="flex items-center mb-4">
+                      <div className="p-2 rounded-lg bg-blue-500 text-white mr-3">
+                        <FiClock className="text-xl" />
+                      </div>
+                      <h3 className="font-semibold text-lg">Reading Timer</h3>
+                    </div>
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="text-3xl font-mono font-bold bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent">
+                        {formatTime(readingTimeLeft)}
+                      </div>
+                      {!timerActive && readingTimeLeft === activePassage.readingTime * 60 && (
+                        <motion.button
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          onClick={startTimer}
+                          className="px-4 py-2 rounded-lg bg-gradient-to-r from-green-500 to-teal-500 text-white shadow-md"
+                        >
+                          Start
+                        </motion.button>
+                      )}
+                      {timerActive && (
+                        <motion.button
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          onClick={() => setTimerActive(false)}
+                          className="px-4 py-2 rounded-lg bg-gradient-to-r from-red-500 to-pink-500 text-white shadow-md"
+                        >
+                          Pause
+                        </motion.button>
+                      )}
+                    </div>
+                    <div className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                      Suggested time: {activePassage.readingTime} min
+                    </div>
+                  </motion.div>
+                  
+                  {/* Difficult Words */}
+                  {difficultWords.length > 0 && (
+                    <motion.div 
+                      variants={itemVariants}
+                      className={`p-5 rounded-xl ${darkMode ? 'bg-gray-600' : 'bg-white'} shadow-md`}
+                    >
+                      <div className="flex items-center mb-4">
+                        <div className="p-2 rounded-lg bg-purple-500 text-white mr-3">
+                          <FiAlertCircle className="text-xl" />
+                        </div>
+                        <h3 className="font-semibold text-lg">Vocabulary Builder</h3>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {difficultWords.map((word, index) => (
+                          <motion.span
+                            key={index}
+                            whileHover={{ y: -2 }}
+                            onClick={() => highlightWord(word)}
+                            className={`px-3 py-1 rounded-full cursor-pointer text-sm font-medium ${
+                              darkMode ? 'bg-purple-900 text-purple-100' : 'bg-purple-100 text-purple-800'
+                            }`}
+                          >
+                            {word}
+                          </motion.span>
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
+                  
+                  {/* Statistics */}
+                  <motion.div 
+                    variants={itemVariants}
+                    className={`p-5 rounded-xl ${darkMode ? 'bg-gray-600' : 'bg-white'} shadow-md`}
+                  >
+                    <div className="flex items-center mb-4">
+                      <div className="p-2 rounded-lg bg-amber-500 text-white mr-3">
+                        <FiAward className="text-xl" />
+                      </div>
+                      <h3 className="font-semibold text-lg">Your Stats</h3>
+                    </div>
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-center">
+                        <span>Highest Score:</span>
+                        <span className="font-bold text-lg bg-gradient-to-r from-amber-400 to-amber-600 bg-clip-text text-transparent">
+                          {stats.highestScore}%
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span>Average Score:</span>
+                        <span className="font-bold text-lg bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">
+                          {stats.averageScore}%
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span>Passages Read:</span>
+                        <span className="font-bold text-lg bg-gradient-to-r from-green-400 to-green-600 bg-clip-text text-transparent">
+                          {stats.attempts}
+                        </span>
+                      </div>
+                    </div>
+                  </motion.div>
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+          
+          {/* Main Content */}
+          <div className="flex-1 p-4 md:p-6">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.3 }}
+              className="space-y-6"
+            >
+              {/* Passage */}
+              <motion.div
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.4 }}
+                className={`p-6 rounded-xl ${darkMode ? 'bg-gray-700' : 'bg-gray-100'} shadow-lg`}
+              >
+                <div className="flex justify-between items-start mb-6">
+                  <div>
+                    <h2 className="text-2xl font-bold mb-1">{activePassage.title}</h2>
+                    <div className={`inline-flex items-center px-3 py-1 rounded-full text-sm ${darkMode ? 'bg-gray-600' : 'bg-gray-200'}`}>
+                      <span className="mr-1">{activePassage.questions.length}</span>
+                      <FiHelpCircle className="text-sm" />
+                    </div>
+                  </div>
+                  <div className={`text-4xl ${activePassage.color.replace('bg-', 'text-')}`}>
+                    {activePassage.icon}
+                  </div>
+                </div>
+                
+                <motion.div 
+                  className={`prose max-w-none mb-6 leading-relaxed ${darkMode ? 'prose-invert' : ''}`}
+                  onClick={(e) => {
+                    if (e.target.tagName === 'SPAN') {
+                      handleWordClick(e);
+                    }
+                  }}
+                  dangerouslySetInnerHTML={{ 
+                    __html: activePassage.content.split(' ').map(word => {
+                      const cleanWord = word.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, '');
+                      const isDifficult = difficultWords.includes(cleanWord);
+                      return isDifficult ? 
+                        `<span class="${darkMode ? 'text-yellow-300 cursor-help' : 'text-yellow-600 cursor-help'}" style="border-bottom: 1px dotted ${darkMode ? '#d1d5db' : '#4b5563'}">${word}</span>` : 
+                        word + ' ';
+                    }).join(' ')
+                  }}
+                />
+              </motion.div>
+              
+              {/* Questions */}
+              <motion.div
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.5 }}
+                className={`p-6 rounded-xl ${darkMode ? 'bg-gray-700' : 'bg-gray-100'} shadow-lg`}
+              >
+                <div className="flex justify-between items-center mb-6">
+                  <h3 className="text-xl font-bold flex items-center">
+                    <FiCheck className="mr-3 text-green-500" /> 
+                    <span>Comprehension Questions</span>
+                  </h3>
+                  <div className={`px-3 py-1 rounded-full text-sm ${darkMode ? 'bg-gray-600' : 'bg-gray-200'}`}>
+                    {Object.keys(answers).length}/{activePassage.questions.length} answered
+                  </div>
+                </div>
+                
+                <motion.div 
+                  variants={containerVariants}
+                  initial="hidden"
+                  animate="visible"
+                  className="space-y-5"
+                >
+                  {activePassage.questions.map((question, qIndex) => (
+                    <motion.div
+                      key={question.id}
+                      variants={itemVariants}
+                      className={`p-5 rounded-xl ${darkMode ? 'bg-gray-600' : 'bg-white'} shadow-md`}
+                    >
+                      <p className="font-semibold text-lg mb-4">{question.text}</p>
+                      
+                      <div className="space-y-3">
+                        {question.options.map((option, index) => {
+                          const isSelected = answers[question.id] === index;
+                          const isCorrect = index === question.correctAnswer;
+                          const showCorrect = showResults && isCorrect;
+                          const showIncorrect = showResults && isSelected && !isCorrect;
+                          
+                          return (
+                            <motion.label
+                              whileHover={{ scale: 1.01 }}
+                              key={index}
+                              className={`flex items-center p-4 rounded-lg cursor-pointer transition-all duration-300 ${
+                                showCorrect ? (darkMode ? 'bg-green-800' : 'bg-green-100') :
+                                showIncorrect ? (darkMode ? 'bg-red-800' : 'bg-red-100') :
+                                isSelected ? (darkMode ? 'bg-blue-700' : 'bg-blue-100') :
+                                darkMode ? 'hover:bg-gray-500' : 'hover:bg-gray-200'
+                              } border ${
+                                showCorrect ? (darkMode ? 'border-green-500' : 'border-green-300') :
+                                showIncorrect ? (darkMode ? 'border-red-500' : 'border-red-300') :
+                                isSelected ? (darkMode ? 'border-blue-500' : 'border-blue-300') :
+                                darkMode ? 'border-gray-500' : 'border-gray-300'
+                              }`}
+                            >
+                              <input
+                                type="radio"
+                                name={`question-${question.id}`}
+                                checked={isSelected}
+                                onChange={() => handleAnswer(question.id, index)}
+                                disabled={showResults}
+                                className="mr-3 h-5 w-5"
+                              />
+                              <span className="flex-1">{option}</span>
+                              {showCorrect && (
+                                <motion.div
+                                  initial={{ scale: 0 }}
+                                  animate={{ scale: 1 }}
+                                  className="ml-2 text-green-500"
+                                >
+                                  <FiCheck className="text-xl" />
+                                </motion.div>
+                              )}
+                              {showIncorrect && (
+                                <motion.div
+                                  initial={{ scale: 0 }}
+                                  animate={{ scale: 1 }}
+                                  className="ml-2 text-red-500"
+                                >
+                                  <FiX className="text-xl" />
+                                </motion.div>
+                              )}
+                            </motion.label>
+                          );
+                        })}
+                      </div>
+                      
+                      {showResults && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: 'auto', opacity: 1 }}
+                          className={`mt-4 overflow-hidden rounded-lg ${darkMode ? 'bg-gray-500' : 'bg-gray-200'}`}
+                        >
+                          <div className="p-4">
+                            <p className="font-semibold mb-2">Explanation:</p>
+                            <p>{question.explanation}</p>
+                          </div>
+                        </motion.div>
+                      )}
+                    </motion.div>
+                  ))}
+                </motion.div>
+                
+                {/* Action buttons */}
+                <div className="mt-8">
+                  {!showResults ? (
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={checkAnswers}
+                      disabled={Object.keys(answers).length < activePassage.questions.length}
+                      className={`w-full py-4 rounded-xl font-bold text-lg flex items-center justify-center ${
+                        Object.keys(answers).length < activePassage.questions.length ? 
+                        (darkMode ? 'bg-gray-600 cursor-not-allowed' : 'bg-gray-300 cursor-not-allowed') : 
+                        'bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600 text-white shadow-lg'
+                      }`}
+                    >
+                      <FiCheck className="mr-2" /> Check Answers
+                    </motion.button>
+                  ) : (
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="space-y-6"
+                    >
+                      <div className={`p-6 rounded-xl ${darkMode ? 'bg-gray-600' : 'bg-gray-200'}`}>
+                        <div className="flex flex-col md:flex-row items-center justify-between">
+                          <div className="mb-4 md:mb-0">
+                            <p className="font-bold text-xl mb-1">Your Score: {calculateScore()}%</p>
+                            <p className={`text-lg ${getPerformanceFeedback(calculateScore()).color}`}>
+                              {getPerformanceFeedback(calculateScore()).message}
+                            </p>
+                          </div>
+                          <div className="relative w-24 h-24">
+                            <svg className="w-full h-full" viewBox="0 0 36 36">
+                              <path
+                                d="M18 2.0845
+                                  a 15.9155 15.9155 0 0 1 0 31.831
+                                  a 15.9155 15.9155 0 0 1 0 -31.831"
+                                fill="none"
+                                stroke={darkMode ? '#4B5563' : '#E5E7EB'}
+                                strokeWidth="3"
+                              />
+                              <path
+                                d="M18 2.0845
+                                  a 15.9155 15.9155 0 0 1 0 31.831
+                                  a 15.9155 15.9155 0 0 1 0 -31.831"
+                                fill="none"
+                                stroke={darkMode ? '#3B82F6' : '#2563EB'}
+                                strokeWidth="3"
+                                strokeDasharray={`${calculateScore()}, 100`}
+                                strokeLinecap="round"
+                              />
+                            </svg>
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <span className="text-2xl font-bold">{calculateScore()}%</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="flex flex-col md:flex-row gap-4">
+                        <motion.button
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                          onClick={resetQuiz}
+                          className="flex-1 py-3 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-medium flex items-center justify-center shadow-lg"
+                        >
+                          <FiRotateCcw className="mr-2" /> Try Again
+                        </motion.button>
+                        <motion.button
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                          onClick={() => {
+                            const nextPassageIndex = passages.findIndex(p => p.id === activePassage.id) + 1;
+                            if (nextPassageIndex < passages.length) {
+                              selectPassage(passages[nextPassageIndex]);
+                            } else {
+                              selectPassage(passages[0]);
+                            }
+                          }}
+                          className="flex-1 py-3 rounded-xl bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white font-medium flex items-center justify-center shadow-lg"
+                        >
+                          Next Passage <FiChevronRight className="ml-1" />
+                        </motion.button>
+                      </div>
+                    </motion.div>
                   )}
                 </div>
-              ))}
-            </div>
-            
-            {/* Action buttons */}
-            <div className="mt-6 flex justify-between">
-              {!showResults ? (
-                <button
-                  onClick={checkAnswers}
-                  disabled={Object.keys(answers).length < activePassage.questions.length}
-                  className={`px-6 py-3 rounded-lg cursor-pointer flex items-center transition-colors duration-200 ${
-                    Object.keys(answers).length < activePassage.questions.length ? 
-                    (darkMode ? 'bg-gray-600 cursor-not-allowed' : 'bg-gray-300 cursor-not-allowed') : 
-                    (darkMode ? 'bg-green-600 hover:bg-green-700' : 'bg-green-500 hover:bg-green-600')
-                  } text-white`}
-                >
-                  <FiCheck className="mr-2" /> Check Answers
-                </button>
-              ) : (
-                <div className="w-full">
-                  <div className={`p-4 rounded-lg mb-4 ${
-                    darkMode ? 'bg-gray-600' : 'bg-gray-200'
-                  }`}>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="font-semibold text-lg">Your Score: {calculateScore()}%</p>
-                        <p className={`mt-1 ${getPerformanceFeedback(calculateScore()).color}`}>
-                          {getPerformanceFeedback(calculateScore()).message}
-                        </p>
-                      </div>
-                      <div className="w-16 h-16 rounded-full border-4 flex items-center justify-center" 
-                        style={{
-                          borderColor: darkMode ? '#4B5563' : '#E5E7EB',
-                          background: `conic-gradient(${darkMode ? '#3B82F6' : '#2563EB'} 0% ${calculateScore()}%, transparent ${calculateScore()}% 100%)`
-                        }}>
-                        <span className="text-lg font-bold">{calculateScore()}%</span>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex justify-between">
-                    <button
-                      onClick={resetQuiz}
-                      className={`px-6 py-3 cursor-pointer rounded-lg flex items-center transition-colors duration-200 ${
-                        darkMode ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'
-                      } text-white`}
-                    >
-                      <FiRotateCcw className="mr-2" /> Try Again
-                    </button>
-                    <button
-                      onClick={() => {
-                        const nextPassageIndex = passages.findIndex(p => p.id === activePassage.id) + 1;
-                        if (nextPassageIndex < passages.length) {
-                          selectPassage(passages[nextPassageIndex]);
-                        } else {
-                          selectPassage(passages[0]);
-                        }
-                      }}
-                      className={`px-6 py-3 rounded-lg cursor-pointer flex items-center transition-colors duration-200 ${
-                        darkMode ? 'bg-purple-600 hover:bg-purple-700' : 'bg-purple-500 hover:bg-purple-600'
-                      } text-white`}
-                    >
-                      Next Passage →
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
+              </motion.div>
+            </motion.div>
           </div>
         </div>
-      </div>
+      </motion.div>
       
       {/* Word definition modal */}
-      {showWordModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className={`p-6 rounded-lg max-w-md w-full mx-4 ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
-            <h3 className="text-xl font-bold mb-2">Word Definition</h3>
-            <p className="text-lg font-medium mb-4">{currentWord}</p>
-            <p className="mb-6">
-              This would show the dictionary definition in a real application. 
-              For this demo, we're highlighting longer or complex words to help 
-              with vocabulary building.
-            </p>
-            <button
-              onClick={() => setShowWordModal(false)}
-              className={`w-full py-2 cursor-pointer rounded ${darkMode ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'} text-white`}
+      <AnimatePresence>
+        {showWordModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+          >
+            <motion.div
+              initial={{ y: 50, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: 50, opacity: 0 }}
+              className={`p-6 rounded-xl max-w-md w-full ${darkMode ? 'bg-gray-800' : 'bg-white'} shadow-2xl`}
             >
-              Close
-            </button>
-          </div>
-        </div>
-      )}
+              <div className="flex justify-between items-start mb-4">
+                <h3 className="text-2xl font-bold bg-gradient-to-r from-purple-500 to-pink-600 bg-clip-text text-transparent">
+                  Word Definition
+                </h3>
+                <button
+                  onClick={() => setShowWordModal(false)}
+                  className={`p-1 rounded-full ${darkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-200'}`}
+                >
+                  <FiX className="text-xl" />
+                </button>
+              </div>
+              
+              <div className="mb-6">
+                <div className={`text-3xl font-bold mb-2 ${darkMode ? 'text-yellow-300' : 'text-yellow-600'}`}>
+                  {currentWord}
+                </div>
+                <div className={`p-4 rounded-lg ${darkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
+                  <p className="mb-2 font-medium">Definition:</p>
+                  <p>
+                    This would show the dictionary definition in a real application. 
+                    For this demo, we're highlighting longer or complex words to help 
+                    with vocabulary building.
+                  </p>
+                </div>
+              </div>
+              
+              <button
+                onClick={() => setShowWordModal(false)}
+                className={`w-full py-3 rounded-lg font-medium ${darkMode ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'} text-white shadow-md`}
+              >
+                Close
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { FiClock, FiBook, FiCalendar, FiPlus, FiCheck, FiChevronDown } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -21,11 +21,10 @@ const StudyDashboard = ({ darkMode }) => {
   const [activeTab, setActiveTab] = useState('tracker');
   const [isAddingSession, setIsAddingSession] = useState(false);
 
-  // Derived values
   const subjects = [...new Set(studyLogs.map((log) => log.subject))];
   const totalHours = studyLogs.reduce((sum, log) => sum + log.duration, 0) / 60;
 
-  // Color palette
+  // Colors
   const colors = {
     primary: darkMode ? 'rgb(99, 102, 241)' : 'rgb(79, 70, 229)',
     cardBg: darkMode ? 'bg-gray-700' : 'bg-gray-50',
@@ -35,7 +34,7 @@ const StudyDashboard = ({ darkMode }) => {
     border: darkMode ? 'border-gray-600' : 'border-gray-200',
   };
 
-  // Animation variants
+  // Animation Variants
   const fadeIn = {
     hidden: { opacity: 0, y: 20 },
     visible: {
@@ -55,6 +54,23 @@ const StudyDashboard = ({ darkMode }) => {
     },
   };
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: { staggerChildren: 0.2 },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.4 },
+    },
+  };
+
   const cardHover = {
     hover: {
       y: -5,
@@ -65,7 +81,6 @@ const StudyDashboard = ({ darkMode }) => {
     },
   };
 
-  // Handlers
   const toggleTask = (id) => {
     setTasks(tasks.map((task) => (task.id === id ? { ...task, completed: !task.completed } : task)));
   };
@@ -102,16 +117,20 @@ const StudyDashboard = ({ darkMode }) => {
       variants={staggerContainer}
       className={`p-6 rounded-lg ${darkMode ? 'bg-gray-800' : 'bg-white'} pt-9 shadow-xl transition-all duration-300 max-w-6xl mx-auto`}
     >
-      {/* Header */}
-      <motion.div variants={fadeIn} className="flex justify-between items-center mb-8">
-        <motion.h2
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.2 }}
-          className={`text-3xl font-bold ${colors.text} flex items-center gap-2`}
+      {/* ✅ Fixed Header */}
+      <motion.div 
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+        className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 md:mb-8 gap-4"
+      >
+        <motion.h2 
+          variants={itemVariants}
+          className="text-3xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-600 flex items-center gap-2"
         >
-          📚 Study Master Dashboard
+          📚 Student  Dashboard
         </motion.h2>
+
         <div className="flex gap-3">
           <motion.button
             whileHover={{ scale: 1.05 }}
@@ -123,6 +142,7 @@ const StudyDashboard = ({ darkMode }) => {
           >
             <FiPlus /> Add Session
           </motion.button>
+
           <div className={`flex rounded-md overflow-hidden ${darkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
             <button
               onClick={() => setActiveTab('tracker')}
@@ -132,9 +152,7 @@ const StudyDashboard = ({ darkMode }) => {
             </button>
             <button
               onClick={() => setActiveTab('planner')}
-              className={`px-4 py-2 ${
-                activeTab === 'planner' ? (darkMode ? 'bg-gray-600' : 'bg-white shadow') : ''
-              }`}
+              className={`px-4 py-2 ${activeTab === 'planner' ? (darkMode ? 'bg-gray-600' : 'bg-white shadow') : ''}`}
             >
               Planner
             </button>
