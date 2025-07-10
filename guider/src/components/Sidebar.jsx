@@ -23,14 +23,12 @@ const Sidebar = ({ darkMode = true, toggleDarkMode, setActiveComponent }) => {
   const [activeItem, setActiveItem] = useState('FlashcardApp');
 
   const menuItems = [
-    { name: 'StudyTracker', label: 'Study Tracker', icon: <FiPieChart size={18} /> },
-    { name: 'StudyPlanner', label: 'Study Planner', icon: <FiCalendar size={18} /> },
-    { name: 'NotesOrganizer', label: 'Notes Organizer', icon: <FiFileText size={18} /> },
-    { name: 'QuizMaker', label: 'Quiz Maker', icon: <FiHelpCircle size={18} /> },
-    { name: 'ResourcesHub', label: 'Study Resources', icon: <FiBook size={18} /> },
-    { name: 'DiscussionForum', label: 'Peer Study', icon: <FiUsers size={18} /> },
-    { name: 'ReadingTrainer', label: 'Reading Comprehension', icon: <FiLayers size={18} /> },
-    { name: 'ExamCountdown', label: 'Exam Countdown', icon: <FiClock size={18} /> },
+    { name: 'StudyTracker', label: 'Study Tracker', icon: <FiPieChart size={20} className="text-purple-500" /> },
+    { name: 'StudyHub', label: 'StudyHub', icon: <FiFileText size={20} className="text-blue-500" /> },
+    { name: 'QuizMaker', label: 'Quiz Maker', icon: <FiHelpCircle size={20} className="text-green-500" /> },
+    { name: 'DiscussionForum', label: 'Peer Study', icon: <FiUsers size={20} className="text-orange-500" /> },
+    { name: 'ReadingTrainer', label: 'Reading Comprehension', icon: <FiLayers size={20} className="text-red-500" /> },
+    { name: 'ExamCountdown', label: 'Exam Countdown', icon: <FiClock size={20} className="text-yellow-500" /> },
   ];
 
   useEffect(() => {
@@ -59,24 +57,22 @@ const Sidebar = ({ darkMode = true, toggleDarkMode, setActiveComponent }) => {
 
   return (
     <div className="flex h-screen overflow-hidden">
-      {/* Mobile Navbar - Only shown when on mobile */}
+      {/* Mobile Navbar - Only shows menu button */}
       {isMobile && (
-        <div className={`fixed top-0 left-0 right-0 flex items-center p-4 pb-5 shadow-sm z-20 ${darkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-800'}`}>
-          <button
-            onClick={() => setIsCollapsed(!isCollapsed)}
-            className={`p-2 cursor-pointer rounded-full ${darkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100'}`}
-          >
-            <FiMenu size={20} />
-          </button>
-          <h1 className="text-xl font-bold ml-4">Student Learning</h1>
-        </div>
+        <button
+          onClick={() => setIsCollapsed(!isCollapsed)}
+          className={`fixed top-4 left-4 p-2 cursor-pointer z-20 ${darkMode ? 'bg-gray-700 text-white' : 'bg-white text-gray-800'}`}
+          style={{ borderRadius: '4px' }}
+        >
+          {isCollapsed ? <FiMenu size={20} /> : <FiX size={20} />}
+        </button>
       )}
 
       {/* Sidebar */}
       <div
         className={`${darkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-800'} shadow-lg transition-all duration-300 ease-in-out ${
           isCollapsed ? 'w-16 md:w-20' : 'w-64'
-        } ${isMobile ? 'fixed top-16 h-[calc(100%-4rem)] z-10' : 'relative'} ${isMobile && isCollapsed ? 'hidden' : ''}`}
+        } ${isMobile ? 'fixed top-0 h-full z-10' : 'relative'}`}
       >
         <div className="flex flex-col h-full">
           {/* Sidebar Header - Hidden on mobile */}
@@ -87,7 +83,8 @@ const Sidebar = ({ darkMode = true, toggleDarkMode, setActiveComponent }) => {
               )}
               <button
                 onClick={() => setIsCollapsed(!isCollapsed)}
-                className={`p-2 cursor-pointer rounded-full ${darkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100'}`}
+                className={`p-2 cursor-pointer ${darkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100'}`}
+                style={{ borderRadius: '4px' }}
               >
                 {isCollapsed ? <FiMenu size={20} /> : <FiX size={20} />}
               </button>
@@ -124,7 +121,7 @@ const Sidebar = ({ darkMode = true, toggleDarkMode, setActiveComponent }) => {
             <div className={`p-4 border-t ${darkMode ? 'border-gray-700' : 'border-gray-200'}`}>
               <div className="flex items-center justify-between">
                 <div className="flex items-center">
-                  <div className={`w-8 h-8 rounded-full ${darkMode ? 'bg-blue-500' : 'bg-blue-400'} flex items-center justify-center text-white mr-2`}>
+                  <div className={`w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white mr-2`}>
                     U
                   </div>
                   <span>User</span>
@@ -143,7 +140,7 @@ const Sidebar = ({ darkMode = true, toggleDarkMode, setActiveComponent }) => {
 
       {/* Main Content Area */}
       <div className="flex-1 overflow-auto">
-        <div className={`min-h-full p-4 ${isMobile ? 'pt-20' : ''} ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-gray-800'}`}>
+        <div className={`min-h-full p-4 ${isMobile ? 'pt-14' : ''} ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-gray-800'}`}>
           {/* Your main content would be rendered here */}
         </div>
       </div>

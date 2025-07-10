@@ -1,10 +1,8 @@
 import { useState } from 'react';
 import Sidebar from './components/Sidebar';
-import StudyTracker from './components/StudyTracker';
-import StudyPlanner from './components/StudyPlanner';
-import NotesOrganizer from './components/NotesOrganizer';
+import StudyDashboard from './components/StudyDashboard';
+import StudyHub from './components/StudyHub';
 import QuizMaker from './components/QuizMaker';
-import ResourcesHub from './components/ResourcesHub';
 import DiscussionForum from './components/DiscussionForum';
 import ReadingTrainer from './components/ReadingTrainer';
 import ExamCountdown from './components/ExamCountdown';
@@ -20,15 +18,13 @@ function App() {
   const renderComponent = () => {
     switch (activeComponent) {
 
-      case 'StudyTracker': return <StudyTracker darkMode={darkMode} />;
-      case 'StudyPlanner': return <StudyPlanner darkMode={darkMode} />;
-      case 'NotesOrganizer': return <NotesOrganizer darkMode={darkMode} />;
+      case 'StudyDashboard': return <StudyDashboard darkMode={darkMode} />;
+      case 'StudyHub': return <StudyHub darkMode={darkMode} />;
       case 'QuizMaker': return <QuizMaker darkMode={darkMode} />;
-      case 'ResourcesHub': return <ResourcesHub darkMode={darkMode} />;
       case 'DiscussionForum': return <DiscussionForum darkMode={darkMode} />;
       case 'ReadingTrainer': return <ReadingTrainer darkMode={darkMode} />;
       case 'ExamCountdown': return <ExamCountdown darkMode={darkMode} />;
-      default: return <StudyTracker darkMode={darkMode} />;
+      default: return <StudyDashboard darkMode={darkMode} />;
     }
   };
 

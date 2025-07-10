@@ -197,15 +197,18 @@ const DiscussionForum  = ({ darkMode = true }) => {
   };
 
   return (
-    <div className={`min-h-screen ${darkMode ? 'bg-gray-900 text-gray-100' : 'bg-gray-50 text-gray-900'}`}>
-      <div className={`sticky top-0 z-10 ${darkMode ? 'bg-gray-800' : 'bg-white'} shadow-md transition-all duration-300 ${isScrolled ? 'py-2' : 'py-4'}`}>
-        <div className="container mx-auto px-4">
-          <h1 className="text-2xl font-bold flex items-center">
-            <FiMessageSquare className="mr-2" />
-            Peer Study Forum
-          </h1>
-        </div>
-      </div>
+<div className={`min-h-screen ${darkMode ? 'bg-gray-900 text-gray-100' : 'bg-gray-50 text-gray-900'} pt-8`}>
+  <div className={`sticky top-0 z-10 ${darkMode ? 'bg-gray-800' : 'bg-white'} shadow-md transition-all duration-300 ${isScrolled ? 'py-2' : 'py-4'}`}>
+    <div className="container mx-auto px-4">
+      <h1 className="text-3xl font-bold flex items-center">
+        <FiMessageSquare className="mr-2" />
+        Peer Study Forum
+      </h1>
+    </div>
+  </div>
+
+  {/* Other page content goes here */}
+
 
       <div className="container mx-auto px-4 py-8">
         {!activeTopic ? (

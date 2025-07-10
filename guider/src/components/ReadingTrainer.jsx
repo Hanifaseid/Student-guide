@@ -221,7 +221,7 @@ const ReadingTrainer  = ({ darkMode = true }) => {
   };
 
   return (
-    <div className={`p-6 rounded-lg transition-colors duration-300 ${darkMode ? 'bg-gray-800 text-gray-100' : 'bg-white text-gray-800'} shadow-xl`}>
+    <div className={`p-6 rounded-lg transition-colors duration-300 ${darkMode ? 'bg-gray-800 text-gray-100' : 'bg-white text-gray-800'} pt-9 shadow-xl`}>
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-3xl font-bold flex items-center">
           <FiBook className="mr-2" /> Reading Comprehension Trainer
