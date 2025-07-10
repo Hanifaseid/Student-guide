@@ -290,7 +290,7 @@ const ReadingTrainer = ({ darkMode = true }) => {
           >
             <FiBook className={`text-3xl mr-3 ${activePassage.color.replace('bg-', 'text-')}`} />
             <h1 className="text-2xl md:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-600">
-              Reading Comprehension Trainer
+              Reading  Trainer
             </h1>
           </motion.div>
           
