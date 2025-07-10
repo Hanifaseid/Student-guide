@@ -160,10 +160,10 @@ const StudyHub = ({ darkMode = true }) => {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 20 }}
               transition={{ duration: 0.3 }}
-              className={`rounded-xl overflow-hidden ${darkMode ? 'bg-gray-800' : 'bg-white'} shadow-2xl`}
+              className={`rounded-xl overflow-hidden ${darkMode ? 'bg-gray-800' : 'bg-white'} shadow-2xl w-full`}
             >
-              <div className="p-6">
-                <div className="flex justify-between items-center mb-6">
+              <div className="p-6 w-full">
+                <div className="flex justify-between items-center mb-6 w-full">
                   <motion.h3 
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
@@ -200,9 +200,9 @@ const StudyHub = ({ darkMode = true }) => {
                       animate={{ opacity: 1, height: 'auto' }}
                       exit={{ opacity: 0, height: 0 }}
                       transition={{ duration: 0.3 }}
-                      className={`rounded-xl overflow-hidden mb-6 ${darkMode ? 'bg-gray-700' : 'bg-gray-100'} shadow-lg`}
+                      className={`rounded-xl overflow-hidden mb-6 ${darkMode ? 'bg-gray-700' : 'bg-gray-100'} shadow-lg w-full`}
                     >
-                      <div className="p-6">
+                      <div className="p-6 w-full">
                         <motion.h3 
                           initial={{ opacity: 0, y: -10 }}
                           animate={{ opacity: 1, y: 0 }}
@@ -211,7 +211,7 @@ const StudyHub = ({ darkMode = true }) => {
                         >
                           Create New Note
                         </motion.h3>
-                        <div className="space-y-4">
+                        <div className="space-y-4 w-full">
                           <motion.div
                             variants={containerVariants}
                             initial="hidden"
@@ -295,10 +295,10 @@ const StudyHub = ({ darkMode = true }) => {
                       animate={{ opacity: 1, height: 'auto' }}
                       exit={{ opacity: 0, height: 0 }}
                       transition={{ duration: 0.3 }}
-                      className={`rounded-xl overflow-hidden mb-6 ${darkMode ? 'bg-gray-700' : 'bg-gray-100'} shadow-lg`}
+                      className={`rounded-xl overflow-hidden mb-6 ${darkMode ? 'bg-gray-700' : 'bg-gray-100'} shadow-lg w-full`}
                     >
-                      <div className="p-6">
-                        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
+                      <div className="p-6 w-full">
+                        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4 w-full">
                           <motion.h3 
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
@@ -310,7 +310,7 @@ const StudyHub = ({ darkMode = true }) => {
                             initial={{ opacity: 0, x: 20 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ delay: 0.2 }}
-                            className="relative w-full md:w-64"
+                            className="relative w-full md:w-96"
                           >
                             <input
                               type="text"
@@ -334,7 +334,7 @@ const StudyHub = ({ darkMode = true }) => {
                           variants={containerVariants}
                           initial="hidden"
                           animate="visible"
-                          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+                          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 w-full"
                         >
                           {filteredNotes.length > 0 ? (
                             filteredNotes.map((note) => (
@@ -346,7 +346,7 @@ const StudyHub = ({ darkMode = true }) => {
                                   setActiveNote(note);
                                   setShowNotesList(false);
                                 }}
-                                className={`p-4 rounded-xl cursor-pointer transition-all duration-300 ${darkMode ? 'bg-gray-600 hover:bg-gray-550' : 'bg-white hover:bg-gray-50'} border ${darkMode ? 'border-gray-500' : 'border-gray-200'} shadow-sm`}
+                                className={`p-4 rounded-xl cursor-pointer transition-all duration-300 ${darkMode ? 'bg-gray-600 hover:bg-gray-550' : 'bg-white hover:bg-gray-50'} border ${darkMode ? 'border-gray-500' : 'border-gray-200'} shadow-sm w-full`}
                               >
                                 <div className="flex justify-between items-start">
                                   <h4 className="font-semibold truncate">{note.title}</h4>
@@ -375,7 +375,7 @@ const StudyHub = ({ darkMode = true }) => {
                               variants={itemVariants}
                               initial="hidden"
                               animate="visible"
-                              className="col-span-full text-center py-8"
+                              className="col-span-full text-center py-8 w-full"
                             >
                               <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mx-auto text-gray-400 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -399,10 +399,10 @@ const StudyHub = ({ darkMode = true }) => {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -20 }}
                       transition={{ duration: 0.3 }}
-                      className={`rounded-xl overflow-hidden ${darkMode ? 'bg-gray-700' : 'bg-gray-100'} shadow-lg`}
+                      className={`rounded-xl overflow-hidden ${darkMode ? 'bg-gray-700' : 'bg-gray-100'} shadow-lg w-full`}
                     >
-                      <div className="p-6">
-                        <div className="flex justify-between items-center mb-6">
+                      <div className="p-6 w-full">
+                        <div className="flex justify-between items-center mb-6 w-full">
                           <motion.h3 
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
@@ -439,7 +439,7 @@ const StudyHub = ({ darkMode = true }) => {
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 1 }}
                           transition={{ delay: 0.2 }}
-                          className={`p-5 rounded-lg mb-6 ${darkMode ? 'bg-gray-600' : 'bg-white'} shadow-inner`}
+                          className={`p-5 rounded-lg mb-6 ${darkMode ? 'bg-gray-600' : 'bg-white'} shadow-inner w-full`}
                         >
                           <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: activeNote.content }} />
                         </motion.div>
@@ -447,7 +447,7 @@ const StudyHub = ({ darkMode = true }) => {
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 1 }}
                           transition={{ delay: 0.3 }}
-                          className="flex flex-wrap gap-2 mb-6"
+                          className="flex flex-wrap gap-2 mb-6 w-full"
                         >
                           {activeNote.tags.map((tag, index) => (
                             <motion.span
@@ -463,7 +463,7 @@ const StudyHub = ({ darkMode = true }) => {
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 1 }}
                           transition={{ delay: 0.4 }}
-                          className={`pt-4 border-t ${darkMode ? 'border-gray-600' : 'border-gray-200'}`}
+                          className={`pt-4 border-t ${darkMode ? 'border-gray-600' : 'border-gray-200'} w-full`}
                         >
                           <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                             Created: {new Date(activeNote.id).toLocaleString()}
@@ -482,9 +482,9 @@ const StudyHub = ({ darkMode = true }) => {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
               transition={{ duration: 0.3 }}
-              className={`rounded-xl overflow-hidden ${darkMode ? 'bg-gray-800' : 'bg-white'} shadow-2xl`}
+              className={`rounded-xl overflow-hidden ${darkMode ? 'bg-gray-800' : 'bg-white'} shadow-2xl w-full`}
             >
-              <div className="p-6">
+              <div className="p-6 w-full">
                 <motion.h3 
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
@@ -492,14 +492,14 @@ const StudyHub = ({ darkMode = true }) => {
                 >
                   Study Resources Hub
                 </motion.h3>
-                <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-                  <div className="lg:col-span-1 space-y-6">
+                <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 w-full">
+                  <div className="lg:col-span-1 space-y-6 w-full">
                     {/* Add Resource Card */}
                     <motion.div
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.2 }}
-                      className={`p-5 rounded-xl ${darkMode ? 'bg-gray-700' : 'bg-gray-50'} shadow-lg`}
+                      className={`p-5 rounded-xl ${darkMode ? 'bg-gray-700' : 'bg-gray-50'} shadow-lg w-full`}
                     >
                       <motion.h3 
                         initial={{ opacity: 0 }}
@@ -509,7 +509,7 @@ const StudyHub = ({ darkMode = true }) => {
                       >
                         Add New Resource
                       </motion.h3>
-                      <div className="space-y-4">
+                      <div className="space-y-4 w-full">
                         <motion.div
                           variants={containerVariants}
                           initial="hidden"
@@ -609,7 +609,7 @@ const StudyHub = ({ darkMode = true }) => {
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.3 }}
-                      className={`p-5 rounded-xl ${darkMode ? 'bg-gray-700' : 'bg-gray-50'} shadow-lg`}
+                      className={`p-5 rounded-xl ${darkMode ? 'bg-gray-700' : 'bg-gray-50'} shadow-lg w-full`}
                     >
                       <motion.h3 
                         initial={{ opacity: 0 }}
@@ -619,7 +619,7 @@ const StudyHub = ({ darkMode = true }) => {
                       >
                         Filters
                       </motion.h3>
-                      <div className="space-y-4">
+                      <div className="space-y-4 w-full">
                         <motion.div
                           variants={containerVariants}
                           initial="hidden"
@@ -680,14 +680,14 @@ const StudyHub = ({ darkMode = true }) => {
                   </div>
 
                   {/* Resources List */}
-                  <div className="lg:col-span-3">
+                  <div className="lg:col-span-3 w-full">
                     <motion.div
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ delay: 0.4 }}
-                      className={`p-5 rounded-xl ${darkMode ? 'bg-gray-700' : 'bg-gray-50'} shadow-lg`}
+                      className={`p-5 rounded-xl ${darkMode ? 'bg-gray-700' : 'bg-gray-50'} shadow-lg w-full`}
                     >
-                      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+                      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4 w-full">
                         <motion.h3 
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 1 }}
@@ -709,14 +709,14 @@ const StudyHub = ({ darkMode = true }) => {
                           variants={containerVariants}
                           initial="hidden"
                           animate="visible"
-                          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"
+                          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 w-full"
                         >
                           {filteredResources.map((resource) => (
                             <motion.div
                               key={resource.id}
                               variants={itemVariants}
                               whileHover={{ y: -5, boxShadow: darkMode ? '0 10px 25px -5px rgba(0, 0, 0, 0.3)' : '0 10px 25px -5px rgba(0, 0, 0, 0.1)' }}
-                              className={`p-5 rounded-xl transition-all duration-300 ${darkMode ? 'bg-gray-600 hover:bg-gray-550' : 'bg-white hover:bg-gray-50'} border ${darkMode ? 'border-gray-500' : 'border-gray-200'} shadow-sm`}
+                              className={`p-5 rounded-xl transition-all duration-300 ${darkMode ? 'bg-gray-600 hover:bg-gray-550' : 'bg-white hover:bg-gray-50'} border ${darkMode ? 'border-gray-500' : 'border-gray-200'} shadow-sm w-full`}
                             >
                               <div className="flex justify-between items-start mb-3">
                                 <h4 className="font-semibold text-lg truncate">{resource.title}</h4>
@@ -773,7 +773,7 @@ const StudyHub = ({ darkMode = true }) => {
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 1 }}
                           transition={{ delay: 0.5 }}
-                          className="text-center py-12"
+                          className="text-center py-12 w-full"
                         >
                           <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 mx-auto text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
