@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   FiPlus, FiTrash2, FiEdit2, FiCheck, FiX, FiCalendar, 
@@ -12,39 +13,10 @@ import {
   FaRegCheckCircle, FaRegClock
 } from 'react-icons/fa';
 
+const API_URL = 'http://localhost:5000/api/exams';
+
 const ExamCountdown = ({ darkMode = true }) => {
-  // Load exams from localStorage if available
-  const [exams, setExams] = useState(() => {
-    const savedExams = localStorage.getItem('exams');
-    return savedExams ? JSON.parse(savedExams) : [
-      { 
-        id: 1, 
-        name: 'Final Math Exam', 
-        date: '2023-06-15',
-        subject: 'Mathematics',
-        priority: 'high',
-        notes: 'Covers all chapters from the semester',
-        tasks: [
-          { id: 1, text: 'Review chapters 1-5', completed: true },
-          { id: 2, text: 'Practice problem sets', completed: false },
-          { id: 3, text: 'Meet with study group', completed: false }
-        ]
-      },
-      { 
-        id: 2, 
-        name: 'Science Midterm', 
-        date: '2023-05-20',
-        subject: 'Biology',
-        priority: 'medium',
-        notes: 'Focus on chapters 4-6',
-        tasks: [
-          { id: 4, text: 'Read lab reports', completed: false },
-          { id: 5, text: 'Memorize key terms', completed: false }
-        ]
-      }
-    ];
-  });
-  
+  const [exams, setExams] = useState([]);
   const [newExam, setNewExam] = useState({ 
     name: '', 
     date: '',
@@ -52,12 +24,10 @@ const ExamCountdown = ({ darkMode = true }) => {
     priority: 'medium',
     notes: ''
   });
-  
   const [newTask, setNewTask] = useState({ 
     text: '', 
     examId: null 
   });
-  
   const [activeExam, setActiveExam] = useState(null);
   const [editMode, setEditMode] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -69,11 +39,61 @@ const ExamCountdown = ({ darkMode = true }) => {
     motivation: true,
     filters: true
   });
+  const [currentQuote, setCurrentQuote] = useState('');
 
-  // Save exams to localStorage whenever they change
+  const motivationalQuotes = [
+    "The secret of getting ahead is getting started. - Mark Twain",
+    "You don't have to be great to start, but you have to start to be great. - Zig Ziglar",
+    "The expert in anything was once a beginner. - Helen Hayes",
+    "Success is the sum of small efforts, repeated day in and day out. - Robert Collier",
+    "Believe you can and you're halfway there. - Theodore Roosevelt",
+    "Don't watch the clock; do what it does. Keep going. - Sam Levenson",
+    "The future belongs to those who believe in the beauty of their dreams. - Eleanor Roosevelt",
+    "You are never too old to set another goal or to dream a new dream. - C.S. Lewis"
+  ];
+
+  // Fetch exams from backend
   useEffect(() => {
-    localStorage.setItem('exams', JSON.stringify(exams));
-  }, [exams]);
+    const fetchExams = async () => {
+      try {
+        const res = await axios.get(API_URL);
+        setExams(res.data);
+      } catch (err) {
+        console.error('Failed to fetch exams:', err);
+        // Fallback to hardcoded data if API fails
+        setExams([
+          { 
+            id: 1, 
+            name: 'Final Math Exam', 
+            date: '2023-06-15',
+            subject: 'Mathematics',
+            priority: 'high',
+            notes: 'Covers all chapters from the semester',
+            tasks: [
+              { id: 1, text: 'Review chapters 1-5', completed: true },
+              { id: 2, text: 'Practice problem sets', completed: false },
+              { id: 3, text: 'Meet with study group', completed: false }
+            ]
+          },
+          { 
+            id: 2, 
+            name: 'Science Midterm', 
+            date: '2023-05-20',
+            subject: 'Biology',
+            priority: 'medium',
+            notes: 'Focus on chapters 4-6',
+            tasks: [
+              { id: 4, text: 'Read lab reports', completed: false },
+              { id: 5, text: 'Memorize key terms', completed: false }
+            ]
+          }
+        ]);
+      }
+    };
+
+    fetchExams();
+    setCurrentQuote(motivationalQuotes[Math.floor(Math.random() * motivationalQuotes.length)]);
+  }, []);
 
   const toggleSection = (section) => {
     setExpandedSections(prev => ({
@@ -82,94 +102,93 @@ const ExamCountdown = ({ darkMode = true }) => {
     }));
   };
 
-  const addExam = () => {
+  const addExam = async () => {
     if (newExam.name && newExam.date) {
-      const exam = { 
-        ...newExam, 
-        id: Date.now(), 
-        tasks: [] 
-      };
-      setExams([...exams, exam]);
-      setNewExam({ name: '', date: '', subject: '', priority: 'medium', notes: '' });
-    }
-  };
-
-  const updateExam = () => {
-    if (newExam.name && newExam.date && activeExam) {
-      setExams(exams.map(exam => 
-        exam.id === activeExam.id ? { ...newExam, id: activeExam.id, tasks: activeExam.tasks } : exam
-      ));
-      setActiveExam({ ...newExam, id: activeExam.id, tasks: activeExam.tasks });
-      setEditMode(false);
-    }
-  };
-
-  const deleteExam = (id) => {
-    setExams(exams.filter(exam => exam.id !== id));
-    if (activeExam && activeExam.id === id) {
-      setActiveExam(null);
-    }
-  };
-
-  const addTask = () => {
-    if (newTask.text && newTask.examId) {
-      const task = { 
-        id: Date.now(), 
-        text: newTask.text, 
-        completed: false,
-        createdAt: new Date().toISOString()
-      };
-      
-      setExams(exams.map(exam => 
-        exam.id === newTask.examId ? 
-          { ...exam, tasks: [...exam.tasks, task] } : 
-          exam
-      ));
-      
-      if (activeExam && activeExam.id === newTask.examId) {
-        setActiveExam({
-          ...activeExam,
-          tasks: [...activeExam.tasks, task]
-        });
+      try {
+        const res = await axios.post(API_URL, newExam);
+        setExams([...exams, res.data]);
+        setNewExam({ name: '', date: '', subject: '', priority: 'medium', notes: '' });
+      } catch (err) {
+        console.error('Failed to add exam:', err);
       }
-      
-      setNewTask({ text: '', examId: null });
     }
   };
 
-  const toggleTask = (examId, taskId) => {
-    const updatedExams = exams.map(exam => 
-      exam.id === examId ? 
-        { 
-          ...exam, 
-          tasks: exam.tasks.map(task => 
-            task.id === taskId ? { ...task, completed: !task.completed } : task
-          ) 
-        } : 
-        exam
-    );
-    
-    setExams(updatedExams);
-    
-    if (activeExam && activeExam.id === examId) {
-      setActiveExam(updatedExams.find(exam => exam.id === examId));
+  const updateExam = async () => {
+    if (newExam.name && newExam.date && activeExam) {
+      try {
+        const res = await axios.put(`${API_URL}/${activeExam.id}`, {
+          ...newExam,
+          tasks: activeExam.tasks
+        });
+        setExams(exams.map(exam => exam.id === res.data.id ? res.data : exam));
+        setActiveExam(res.data);
+        setEditMode(false);
+      } catch (err) {
+        console.error('Failed to update exam:', err);
+      }
     }
   };
 
-  const deleteTask = (examId, taskId) => {
-    const updatedExams = exams.map(exam => 
-      exam.id === examId ? 
-        { 
-          ...exam, 
-          tasks: exam.tasks.filter(task => task.id !== taskId)
-        } : 
-        exam
-    );
-    
-    setExams(updatedExams);
-    
-    if (activeExam && activeExam.id === examId) {
-      setActiveExam(updatedExams.find(exam => exam.id === examId));
+  const deleteExam = async (id) => {
+    try {
+      await axios.delete(`${API_URL}/${id}`);
+      setExams(exams.filter(exam => exam.id !== id));
+      if (activeExam && activeExam.id === id) {
+        setActiveExam(null);
+      }
+    } catch (err) {
+      console.error('Failed to delete exam:', err);
+    }
+  };
+
+  const addTask = async () => {
+    if (newTask.text && newTask.examId) {
+      try {
+        const task = {
+          text: newTask.text,
+          completed: false
+        };
+        const res = await axios.post(`${API_URL}/${newTask.examId}/tasks`, task);
+        const updatedExam = res.data;
+        setExams(exams.map(exam => exam.id === updatedExam.id ? updatedExam : exam));
+        if (activeExam && activeExam.id === updatedExam.id) {
+          setActiveExam(updatedExam);
+        }
+        setNewTask({ text: '', examId: null });
+      } catch (err) {
+        console.error('Failed to add task:', err);
+      }
+    }
+  };
+
+  const toggleTask = async (examId, taskId) => {
+    try {
+      const examRes = await axios.get(`${API_URL}/${examId}`);
+      const exam = examRes.data;
+      const task = exam.tasks.find(t => t._id === taskId);
+      task.completed = !task.completed;
+      const res = await axios.put(`${API_URL}/${examId}`, exam);
+      const updatedExam = res.data;
+      setExams(exams.map(exam => exam.id === updatedExam.id ? updatedExam : exam));
+      if (activeExam && activeExam.id === updatedExam.id) {
+        setActiveExam(updatedExam);
+      }
+    } catch (err) {
+      console.error('Failed to toggle task:', err);
+    }
+  };
+
+  const deleteTask = async (examId, taskId) => {
+    try {
+      const res = await axios.delete(`${API_URL}/${examId}/tasks/${taskId}`);
+      const updatedExam = res.data;
+      setExams(exams.map(exam => exam.id === updatedExam.id ? updatedExam : exam));
+      if (activeExam && activeExam.id === updatedExam.id) {
+        setActiveExam(updatedExam);
+      }
+    } catch (err) {
+      console.error('Failed to delete task:', err);
     }
   };
 
@@ -201,21 +220,6 @@ const ExamCountdown = ({ darkMode = true }) => {
     }
   };
 
-  const motivationalQuotes = [
-    "The secret of getting ahead is getting started. - Mark Twain",
-    "You don't have to be great to start, but you have to start to be great. - Zig Ziglar",
-    "The expert in anything was once a beginner. - Helen Hayes",
-    "Success is the sum of small efforts, repeated day in and day out. - Robert Collier",
-    "Believe you can and you're halfway there. - Theodore Roosevelt",
-    "Don't watch the clock; do what it does. Keep going. - Sam Levenson",
-    "The future belongs to those who believe in the beauty of their dreams. - Eleanor Roosevelt",
-    "You are never too old to set another goal or to dream a new dream. - C.S. Lewis"
-  ];
-
-  const [currentQuote, setCurrentQuote] = useState(
-    motivationalQuotes[Math.floor(Math.random() * motivationalQuotes.length)]
-  );
-
   const changeQuote = () => {
     setCurrentQuote(motivationalQuotes[Math.floor(Math.random() * motivationalQuotes.length)]);
   };
@@ -229,15 +233,13 @@ const ExamCountdown = ({ darkMode = true }) => {
     const isUpcoming = daysLeft >= 0;
     const matchesTab = (activeTab === 'upcoming' && isUpcoming) || 
                       (activeTab === 'past' && daysLeft < 0);
-    
     return matchesSearch && matchesPriority && matchesTab;
   });
 
-  // Sort exams by date (soonest first for upcoming, most recent first for past)
+  // Sort exams by date
   const sortedExams = [...filteredExams].sort((a, b) => {
     const aDays = calculateDaysLeft(a.date);
     const bDays = calculateDaysLeft(b.date);
-    
     if (activeTab === 'upcoming') {
       return aDays - bDays;
     } else {
@@ -261,7 +263,6 @@ const ExamCountdown = ({ darkMode = true }) => {
       }
     }
   };
-
   const itemVariants = {
     hidden: { y: 20, opacity: 0 },
     visible: {
@@ -273,16 +274,15 @@ const ExamCountdown = ({ darkMode = true }) => {
       }
     }
   };
-
   const fadeIn = {
     hidden: { opacity: 0 },
     visible: { opacity: 1, transition: { duration: 0.5 } }
   };
-
   const slideUp = {
     hidden: { y: 50, opacity: 0 },
     visible: { y: 0, opacity: 1, transition: { duration: 0.5 } }
   };
+      
 
   return (
     <motion.div 
