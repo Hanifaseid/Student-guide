@@ -17,6 +17,7 @@ const API_URL = 'http://localhost:5000/api/exams';
 
 const ExamCountdown = ({ darkMode = true }) => {
   const [exams, setExams] = useState([]);
+  const [user, setUser] = useState(null); 
   const [newExam, setNewExam] = useState({ 
     name: '', 
     date: '',
@@ -54,46 +55,68 @@ const ExamCountdown = ({ darkMode = true }) => {
 
   // Fetch exams from backend
   useEffect(() => {
-    const fetchExams = async () => {
-      try {
-        const res = await axios.get(API_URL);
-        setExams(res.data);
-      } catch (err) {
-        console.error('Failed to fetch exams:', err);
-        // Fallback to hardcoded data if API fails
-        setExams([
-          { 
-            id: 1, 
-            name: 'Final Math Exam', 
-            date: '2023-06-15',
-            subject: 'Mathematics',
-            priority: 'high',
-            notes: 'Covers all chapters from the semester',
-            tasks: [
-              { id: 1, text: 'Review chapters 1-5', completed: true },
-              { id: 2, text: 'Practice problem sets', completed: false },
-              { id: 3, text: 'Meet with study group', completed: false }
-            ]
-          },
-          { 
-            id: 2, 
-            name: 'Science Midterm', 
-            date: '2023-05-20',
-            subject: 'Biology',
-            priority: 'medium',
-            notes: 'Focus on chapters 4-6',
-            tasks: [
-              { id: 4, text: 'Read lab reports', completed: false },
-              { id: 5, text: 'Memorize key terms', completed: false }
-            ]
-          }
-        ]);
-      }
-    };
+  const fetchExams = async () => {
+    try {
+      const res = await axios.get(API_URL, {
+        headers: {
+          Authorization: `Bearer ${user.token}` // Assuming you have auth
+        }
+      });
+      setExams(res.data);
+    } catch (err) {
+      console.error('Failed to fetch exams:', err);
+    }
+  };
 
-    fetchExams();
-    setCurrentQuote(motivationalQuotes[Math.floor(Math.random() * motivationalQuotes.length)]);
-  }, []);
+  fetchExams(); // Call the async function
+}, []); // Add dependency if needed
+useEffect(() => {
+  const fetchExams = async () => {
+    try {
+      const res = await axios.get(API_URL, {
+        headers: {
+          Authorization: `Bearer ${user.token}` // Assuming you have auth
+        }
+      });
+      setExams(res.data);
+    } catch (err) {
+      console.error('Failed to fetch exams:', err);
+
+      // Fallback to hardcoded data if API fails
+      setExams([
+        { 
+          id: 1, 
+          name: 'Final Math Exam', 
+          date: '2023-06-15',
+          subject: 'Mathematics',
+          priority: 'high',
+          notes: 'Covers all chapters from the semester',
+          tasks: [
+            { id: 1, text: 'Review chapters 1-5', completed: true },
+            { id: 2, text: 'Practice problem sets', completed: false },
+            { id: 3, text: 'Meet with study group', completed: false }
+          ]
+        },
+        { 
+          id: 2, 
+          name: 'Science Midterm', 
+          date: '2023-05-20',
+          subject: 'Biology',
+          priority: 'medium',
+          notes: 'Focus on chapters 4-6',
+          tasks: [
+            { id: 4, text: 'Read lab reports', completed: false },
+            { id: 5, text: 'Memorize key terms', completed: false }
+          ]
+        }
+      ]);
+    }
+  };
+
+  fetchExams();
+  setCurrentQuote(motivationalQuotes[Math.floor(Math.random() * motivationalQuotes.length)]);
+}, []);
+
 
   const toggleSection = (section) => {
     setExpandedSections(prev => ({
