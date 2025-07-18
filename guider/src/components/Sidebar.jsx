@@ -16,8 +16,10 @@ import {
   FiPieChart,
   FiLayers
 } from 'react-icons/fi';
+import { useAuth } from '../context/AuthContext'; // ✅ import AuthContext
 
 const Sidebar = ({ darkMode = true, toggleDarkMode, setActiveComponent }) => {
+  const { user } = useAuth(); // ✅ get user from context
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [activeItem, setActiveItem] = useState('FlashcardApp');
@@ -35,11 +37,7 @@ const Sidebar = ({ darkMode = true, toggleDarkMode, setActiveComponent }) => {
     const handleResize = () => {
       const mobile = window.innerWidth < 768;
       setIsMobile(mobile);
-      if (mobile) {
-        setIsCollapsed(true);
-      } else {
-        setIsCollapsed(false);
-      }
+      setIsCollapsed(mobile);
     };
 
     handleResize();
@@ -50,14 +48,12 @@ const Sidebar = ({ darkMode = true, toggleDarkMode, setActiveComponent }) => {
   const handleItemClick = (name) => {
     setActiveItem(name);
     setActiveComponent(name);
-    if (isMobile) {
-      setIsCollapsed(true);
-    }
+    if (isMobile) setIsCollapsed(true);
   };
 
   return (
     <div className="flex h-screen overflow-hidden">
-      {/* Mobile Navbar - Only shows menu button */}
+      {/* Mobile Navbar - Menu Toggle Button */}
       {isMobile && (
         <button
           onClick={() => setIsCollapsed(!isCollapsed)}
@@ -75,12 +71,10 @@ const Sidebar = ({ darkMode = true, toggleDarkMode, setActiveComponent }) => {
         } ${isMobile ? 'fixed top-0 h-full z-10' : 'relative'}`}
       >
         <div className="flex flex-col h-full">
-          {/* Sidebar Header - Hidden on mobile */}
+          {/* Sidebar Header */}
           {!isMobile && (
             <div className={`flex items-center ${isCollapsed ? 'justify-center p-4' : 'justify-between p-4'}`}>
-              {!isCollapsed && (
-                <h1 className="text-xl font-bold">Student Learning</h1>
-              )}
+              {!isCollapsed && <h1 className="text-xl font-bold">Student Learning</h1>}
               <button
                 onClick={() => setIsCollapsed(!isCollapsed)}
                 className={`p-2 cursor-pointer ${darkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100'}`}
@@ -91,7 +85,7 @@ const Sidebar = ({ darkMode = true, toggleDarkMode, setActiveComponent }) => {
             </div>
           )}
 
-          {/* Sidebar Menu */}
+          {/* Menu Items */}
           <nav className="flex-1 overflow-y-auto">
             <ul className="space-y-1 p-2">
               {menuItems.map((item) => (
@@ -116,15 +110,15 @@ const Sidebar = ({ darkMode = true, toggleDarkMode, setActiveComponent }) => {
             </ul>
           </nav>
 
-          {/* Sidebar Footer - Only show in expanded mode */}
+          {/* Footer - User Info */}
           {!isCollapsed && (
             <div className={`p-4 border-t ${darkMode ? 'border-gray-700' : 'border-gray-200'}`}>
               <div className="flex items-center justify-between">
                 <div className="flex items-center">
-                  <div className={`w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white mr-2`}>
-                    U
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white mr-2 font-bold">
+                    {user?.name?.[0]?.toUpperCase() || 'U'}
                   </div>
-                  <span>User</span>
+                  <span>{user?.name || 'User'}</span>
                 </div>
                 <button
                   onClick={toggleDarkMode}
@@ -138,7 +132,7 @@ const Sidebar = ({ darkMode = true, toggleDarkMode, setActiveComponent }) => {
         </div>
       </div>
 
-      {/* Main Content Area */}
+      {/* Main Content */}
       <div className="flex-1 overflow-auto">
         <div className={`min-h-full p-4 ${isMobile ? 'pt-14' : ''} ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-gray-800'}`}>
           {/* Your main content would be rendered here */}

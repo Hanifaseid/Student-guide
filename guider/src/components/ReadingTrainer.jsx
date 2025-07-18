@@ -139,6 +139,9 @@ const ReadingTrainer = ({ darkMode = true }) => {
   const [difficultWords, setDifficultWords] = useState([]);
   const [readingTimeLeft, setReadingTimeLeft] = useState(passages[0].readingTime * 60);
   const [timerActive, setTimerActive] = useState(false);
+   const [hasStarted, setHasStarted] = useState(false);
+   const [readingDuration, setReadingDuration] = useState(activePassage.readingTime || 5); 
+  const [userSetTime, setUserSetTime] = useState('');
   const [stats, setStats] = useState({
     attempts: 0,
     highestScore: 0,
@@ -354,47 +357,88 @@ const ReadingTrainer = ({ darkMode = true }) => {
                       ))}
                     </div>
                   </motion.div>
-                  
-                  {/* Timer */}
-                  <motion.div 
-                    variants={itemVariants}
-                    className={`p-5 rounded-xl ${darkMode ? 'bg-gray-600' : 'bg-white'} shadow-md`}
-                  >
-                    <div className="flex items-center mb-4">
-                      <div className="p-2 rounded-lg bg-blue-500 text-white mr-3">
-                        <FiClock className="text-xl" />
-                      </div>
-                      <h3 className="font-semibold text-lg">Reading Timer</h3>
-                    </div>
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="text-3xl font-mono font-bold bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent">
-                        {formatTime(readingTimeLeft)}
-                      </div>
-                      {!timerActive && readingTimeLeft === activePassage.readingTime * 60 && (
-                        <motion.button
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                          onClick={startTimer}
-                          className="px-4 py-2 rounded-lg bg-gradient-to-r from-green-500 to-teal-500 text-white shadow-md"
-                        >
-                          Start
-                        </motion.button>
-                      )}
-                      {timerActive && (
-                        <motion.button
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                          onClick={() => setTimerActive(false)}
-                          className="px-4 py-2 rounded-lg bg-gradient-to-r from-red-500 to-pink-500 text-white shadow-md"
-                        >
-                          Pause
-                        </motion.button>
-                      )}
-                    </div>
-                    <div className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                      Suggested time: {activePassage.readingTime} min
-                    </div>
-                  </motion.div>
+             {/* Timer */}
+<motion.div
+  variants={itemVariants}
+  className={`p-5 rounded-xl ${darkMode ? 'bg-gray-600' : 'bg-white'} shadow-md`}
+>
+  <div className="flex items-center mb-4">
+    <div className="p-2 rounded-lg bg-blue-500 text-white mr-3">
+      <FiClock className="text-xl" />
+    </div>
+    <h3 className="font-semibold text-lg">Reading Timer</h3>
+  </div>
+
+  <div className="flex items-center justify-between mb-3">
+    <div className="text-3xl font-mono font-bold bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent">
+      {formatTime(readingTimeLeft)}
+    </div>
+
+    {/* Start Button */}
+    {!timerActive && readingTimeLeft === readingDuration * 60 && (
+      <motion.button
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        onClick={startTimer}
+        className="px-4 py-2 rounded-lg bg-gradient-to-r from-green-500 to-teal-500 text-white shadow-md"
+      >
+        Start
+      </motion.button>
+    )}
+
+    {/* Resume Button */}
+    {!timerActive && readingTimeLeft < readingDuration * 60 && readingTimeLeft > 0 && (
+      <motion.button
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        onClick={() => setTimerActive(true)}
+        className="px-4 py-2 rounded-lg bg-gradient-to-r from-green-500 to-teal-500 text-white shadow-md"
+      >
+        Resume
+      </motion.button>
+    )}
+
+    {/* Pause Button */}
+    {timerActive && (
+      <motion.button
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        onClick={() => setTimerActive(false)}
+        className="px-4 py-2 rounded-lg bg-gradient-to-r from-red-500 to-pink-500 text-white shadow-md"
+      >
+        Pause
+      </motion.button>
+    )}
+  </div>
+
+  {/* Time Setter */}
+  <div className="flex items-center gap-2 mb-3">
+    <label className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+      Set Timer (minutes):
+    </label>
+    <input
+      type="number"
+      min="1"
+      value={readingDuration}
+      onChange={e => {
+        const minutes = Math.max(1, parseInt(e.target.value || 1));
+        setReadingDuration(minutes);
+        setReadingTimeLeft(minutes * 60);
+        setTimerActive(false); // Reset the timer when changing duration
+      }}
+      className={`w-16 px-2 py-1 rounded border text-sm ${
+        darkMode
+          ? 'bg-gray-700 text-white border-gray-500 placeholder-gray-400'
+          : 'bg-white text-gray-700 border-gray-300'
+      }`}
+    />
+  </div>
+
+  <div className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+    Suggested time: {activePassage.readingTime} min
+  </div>
+</motion.div>
+
                   
                   {/* Difficult Words */}
                   {difficultWords.length > 0 && (
