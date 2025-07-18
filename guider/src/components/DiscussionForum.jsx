@@ -12,7 +12,7 @@ import {
   FiX
 } from 'react-icons/fi';
 
-const API_URL = 'http://localhost:5000/api/topics';
+const API_URL = 'https://student-guide-backend-cb6l.onrender.com/api/topics';
 
 const DiscussionForum = ({ darkMode = true }) => {
   const [topics, setTopics] = useState([]);

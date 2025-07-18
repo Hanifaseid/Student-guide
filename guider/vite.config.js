@@ -7,7 +7,7 @@ export default defineConfig({
   plugins: [tailwindcss(), react()],
   server: {
     proxy: {
-      '/api': 'http://localhost:5000',  // <-- Add this proxy to forward API requests to backend
+      '/api': 'https://student-guide-backend-cb6l.onrender.com',  // <-- Add this proxy to forward API requests to backend
     },
   },
 })

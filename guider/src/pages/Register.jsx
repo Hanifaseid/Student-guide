@@ -18,7 +18,7 @@ export default function Register() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('http://localhost:5000/api/auth/register', form);
+      await axios.post('https://student-guide-backend-cb6l.onrender.com/api/auth/register', form);
       toast.success('Registration successful! Please log in.');
       navigate('/login');
     } catch (error) {

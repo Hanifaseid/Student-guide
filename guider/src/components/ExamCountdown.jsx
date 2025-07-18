@@ -13,7 +13,7 @@ import {
   FaRegCheckCircle, FaRegClock
 } from 'react-icons/fa';
 
-const API_URL = 'http://localhost:5000/api/exams';
+const API_URL = 'https://student-guide-backend-cb6l.onrender.com/api/exams';
 
 const ExamCountdown = ({ darkMode = true }) => {
   const [exams, setExams] = useState([]);
@@ -55,69 +55,50 @@ const ExamCountdown = ({ darkMode = true }) => {
 
   // Fetch exams from backend
   useEffect(() => {
-  const fetchExams = async () => {
-    try {
-      const res = await axios.get(API_URL, {
-        headers: {
-          Authorization: `Bearer ${user.token}` // Assuming you have auth
-        }
-      });
-      setExams(res.data);
-    } catch (err) {
-      console.error('Failed to fetch exams:', err);
-    }
-  };
+    const fetchExams = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const headers = token ? { Authorization: `Bearer ${token}` } : {};
+        const res = await axios.get(API_URL, { headers });
+        setExams(res.data);
+      } catch (err) {
+        console.error('Failed to fetch exams:', err);
+        // Fallback to hardcoded data if API fails
+        setExams([
+          { 
+            id: 1, 
+            name: 'Final Math Exam', 
+            date: '2023-06-15',
+            subject: 'Mathematics',
+            priority: 'high',
+            notes: 'Covers all chapters from the semester',
+            tasks: [
+              { id: 1, text: 'Review chapters 1-5', completed: true },
+              { id: 2, text: 'Practice problem sets', completed: false },
+              { id: 3, text: 'Meet with study group', completed: false }
+            ]
+          },
+          { 
+            id: 2, 
+            name: 'Science Midterm', 
+            date: '2023-05-20',
+            subject: 'Biology',
+            priority: 'medium',
+            notes: 'Focus on chapters 4-6',
+            tasks: [
+              { id: 4, text: 'Read lab reports', completed: false },
+              { id: 5, text: 'Memorize key terms', completed: false }
+            ]
+          }
+        ]);
+      }
+    };
 
-  fetchExams(); // Call the async function
-}, []); // Add dependency if needed
-useEffect(() => {
-  const fetchExams = async () => {
-    try {
-      const res = await axios.get(API_URL, {
-        headers: {
-          Authorization: `Bearer ${user.token}` // Assuming you have auth
-        }
-      });
-      setExams(res.data);
-    } catch (err) {
-      console.error('Failed to fetch exams:', err);
+    fetchExams();
+    setCurrentQuote(motivationalQuotes[Math.floor(Math.random() * motivationalQuotes.length)]);
+  }, []);
 
-      // Fallback to hardcoded data if API fails
-      setExams([
-        { 
-          id: 1, 
-          name: 'Final Math Exam', 
-          date: '2023-06-15',
-          subject: 'Mathematics',
-          priority: 'high',
-          notes: 'Covers all chapters from the semester',
-          tasks: [
-            { id: 1, text: 'Review chapters 1-5', completed: true },
-            { id: 2, text: 'Practice problem sets', completed: false },
-            { id: 3, text: 'Meet with study group', completed: false }
-          ]
-        },
-        { 
-          id: 2, 
-          name: 'Science Midterm', 
-          date: '2023-05-20',
-          subject: 'Biology',
-          priority: 'medium',
-          notes: 'Focus on chapters 4-6',
-          tasks: [
-            { id: 4, text: 'Read lab reports', completed: false },
-            { id: 5, text: 'Memorize key terms', completed: false }
-          ]
-        }
-      ]);
-    }
-  };
-
-  fetchExams();
-  setCurrentQuote(motivationalQuotes[Math.floor(Math.random() * motivationalQuotes.length)]);
-}, []);
-
-
+  // Rest of your functions remain exactly the same
   const toggleSection = (section) => {
     setExpandedSections(prev => ({
       ...prev,
@@ -128,7 +109,9 @@ useEffect(() => {
   const addExam = async () => {
     if (newExam.name && newExam.date) {
       try {
-        const res = await axios.post(API_URL, newExam);
+        const token = localStorage.getItem('token');
+        const headers = token ? { Authorization: `Bearer ${token}` } : {};
+        const res = await axios.post(API_URL, newExam, { headers });
         setExams([...exams, res.data]);
         setNewExam({ name: '', date: '', subject: '', priority: 'medium', notes: '' });
       } catch (err) {
@@ -140,10 +123,12 @@ useEffect(() => {
   const updateExam = async () => {
     if (newExam.name && newExam.date && activeExam) {
       try {
+        const token = localStorage.getItem('token');
+        const headers = token ? { Authorization: `Bearer ${token}` } : {};
         const res = await axios.put(`${API_URL}/${activeExam.id}`, {
           ...newExam,
           tasks: activeExam.tasks
-        });
+        }, { headers });
         setExams(exams.map(exam => exam.id === res.data.id ? res.data : exam));
         setActiveExam(res.data);
         setEditMode(false);
@@ -155,7 +140,9 @@ useEffect(() => {
 
   const deleteExam = async (id) => {
     try {
-      await axios.delete(`${API_URL}/${id}`);
+      const token = localStorage.getItem('token');
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+      await axios.delete(`${API_URL}/${id}`, { headers });
       setExams(exams.filter(exam => exam.id !== id));
       if (activeExam && activeExam.id === id) {
         setActiveExam(null);
@@ -168,11 +155,13 @@ useEffect(() => {
   const addTask = async () => {
     if (newTask.text && newTask.examId) {
       try {
+        const token = localStorage.getItem('token');
+        const headers = token ? { Authorization: `Bearer ${token}` } : {};
         const task = {
           text: newTask.text,
           completed: false
         };
-        const res = await axios.post(`${API_URL}/${newTask.examId}/tasks`, task);
+        const res = await axios.post(`${API_URL}/${newTask.examId}/tasks`, task, { headers });
         const updatedExam = res.data;
         setExams(exams.map(exam => exam.id === updatedExam.id ? updatedExam : exam));
         if (activeExam && activeExam.id === updatedExam.id) {
@@ -187,11 +176,13 @@ useEffect(() => {
 
   const toggleTask = async (examId, taskId) => {
     try {
-      const examRes = await axios.get(`${API_URL}/${examId}`);
+      const token = localStorage.getItem('token');
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+      const examRes = await axios.get(`${API_URL}/${examId}`, { headers });
       const exam = examRes.data;
       const task = exam.tasks.find(t => t._id === taskId);
       task.completed = !task.completed;
-      const res = await axios.put(`${API_URL}/${examId}`, exam);
+      const res = await axios.put(`${API_URL}/${examId}`, exam, { headers });
       const updatedExam = res.data;
       setExams(exams.map(exam => exam.id === updatedExam.id ? updatedExam : exam));
       if (activeExam && activeExam.id === updatedExam.id) {
@@ -204,7 +195,9 @@ useEffect(() => {
 
   const deleteTask = async (examId, taskId) => {
     try {
-      const res = await axios.delete(`${API_URL}/${examId}/tasks/${taskId}`);
+      const token = localStorage.getItem('token');
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+      const res = await axios.delete(`${API_URL}/${examId}/tasks/${taskId}`, { headers });
       const updatedExam = res.data;
       setExams(exams.map(exam => exam.id === updatedExam.id ? updatedExam : exam));
       if (activeExam && activeExam.id === updatedExam.id) {
@@ -215,6 +208,7 @@ useEffect(() => {
     }
   };
 
+  // Rest of your helper functions remain exactly the same
   const calculateDaysLeft = (date) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -247,7 +241,7 @@ useEffect(() => {
     setCurrentQuote(motivationalQuotes[Math.floor(Math.random() * motivationalQuotes.length)]);
   };
 
-  // Filter exams based on search term, priority filter, and active tab
+  // Filter and sort functions remain exactly the same
   const filteredExams = exams.filter(exam => {
     const matchesSearch = exam.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
                          exam.subject.toLowerCase().includes(searchTerm.toLowerCase());
@@ -259,7 +253,6 @@ useEffect(() => {
     return matchesSearch && matchesPriority && matchesTab;
   });
 
-  // Sort exams by date
   const sortedExams = [...filteredExams].sort((a, b) => {
     const aDays = calculateDaysLeft(a.date);
     const bDays = calculateDaysLeft(b.date);
@@ -270,12 +263,11 @@ useEffect(() => {
     }
   });
 
-  // Calculate overall progress
   const totalTasks = exams.reduce((sum, exam) => sum + exam.tasks.length, 0);
   const completedTasks = exams.reduce((sum, exam) => sum + exam.tasks.filter(t => t.completed).length, 0);
   const overallProgress = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
 
-  // Animation variants
+  // Animation variants remain exactly the same
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {

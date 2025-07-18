@@ -32,7 +32,7 @@ const StudyHub = ({ darkMode = true }) => {
 
   // API Config
   const api = axios.create({
-    baseURL: 'http://localhost:5000/api/studyhub',
+    baseURL: 'https://student-guide-backend-cb6l.onrender.com/api/studyhub',
     headers: {
       'Authorization': `Bearer ${localStorage.getItem('token')}`
     }
