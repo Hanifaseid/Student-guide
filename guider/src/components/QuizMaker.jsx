@@ -4,9 +4,10 @@ import { FiPlus, FiX, FiChevronDown, FiCheck } from 'react-icons/fi';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 
+const API_BASE = 'https://student-guide-backend-cb6l.onrender.com';
+
 const QuizMaker = ({ darkMode }) => {
-  /* ──────────────────────────────────── state ─────────────────────────────────── */
-  const { user } = useAuth();
+  const { token } = useAuth(); // get token for auth headers
   const [quizzes, setQuizzes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeQuiz, setActiveQuiz] = useState(null);
@@ -20,11 +21,13 @@ const QuizMaker = ({ darkMode }) => {
     correctAnswer: 0,
   });
 
-  /* ───────────────────────────── fetch quizzes on mount ───────────────────────── */
   useEffect(() => {
     const fetchQuizzes = async () => {
+      if (!token) return; // avoid fetching without token
       try {
-        const res = await axios.get('/api/quizzes');
+        const res = await axios.get(`${API_BASE}/api/quizzes`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         setQuizzes(res.data || []);
       } catch (err) {
         console.error('Error fetching quizzes:', err.response?.data?.message || err.message);
@@ -33,16 +36,21 @@ const QuizMaker = ({ darkMode }) => {
       }
     };
     fetchQuizzes();
-  }, []);
+  }, [token]);
 
-  /* ──────────────────────────────── handlers ──────────────────────────────────── */
   const addQuiz = async () => {
-    if (!newQuiz.title || newQuiz.questions.length === 0) return;
+    if (!newQuiz.title || newQuiz.questions.length === 0 || !token) return;
     try {
-      const res = await axios.post('/api/quizzes', {
-        title: newQuiz.title,
-        questions: newQuiz.questions,
-      });
+      const res = await axios.post(
+        `${API_BASE}/api/quizzes`,
+        {
+          title: newQuiz.title,
+          questions: newQuiz.questions,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
       setQuizzes((prev) => [...prev, res.data]);
       setNewQuiz({ title: '', questions: [] });
       setIsAddingQuiz(false);
@@ -53,23 +61,23 @@ const QuizMaker = ({ darkMode }) => {
 
   const addQuestion = () => {
     if (!newQuestion.text) return;
-    
+
     if (newQuestion.type === 'multiple_choice') {
       const filledOptions = newQuestion.options.filter(opt => opt.trim() !== '');
       if (filledOptions.length < 2) return;
     }
 
-    const question = { 
-      ...newQuestion, 
+    const question = {
+      ...newQuestion,
       id: Date.now(),
-      options: newQuestion.type === 'multiple_choice' 
-        ? newQuestion.options.filter(opt => opt.trim() !== '') 
-        : newQuestion.options
+      options:
+        newQuestion.type === 'multiple_choice'
+          ? newQuestion.options.filter(opt => opt.trim() !== '')
+          : newQuestion.options,
     };
-    
+
     setNewQuiz((prev) => ({ ...prev, questions: [...prev.questions, question] }));
 
-    // Reset with 2 empty options for multiple choice
     setNewQuestion({
       text: '',
       type: 'multiple_choice',
