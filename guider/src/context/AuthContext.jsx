@@ -1,7 +1,10 @@
-// AuthContext.jsx (updated)
+// src/context/AuthContext.jsx
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
+
+// 🔗 Hardcoded API URL (no .env file used)
+const API_URL = 'https://student-guide-backend-cb6l.onrender.com/api/auth';
 
 const AuthContext = createContext();
 
@@ -10,7 +13,6 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(null);
 
   useEffect(() => {
-    // Restore user & token from localStorage on app start
     const storedUser = localStorage.getItem('user');
     const storedToken = localStorage.getItem('token');
     if (storedUser && storedToken) {
@@ -21,15 +23,19 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = async (email, password) => {
-    const response = await axios.post('/api/auth/login', { email, password });
-    const { user, token } = response.data;
-    setUser(user);
-    setToken(token);
-    localStorage.setItem('user', JSON.stringify(user));
-    localStorage.setItem('token', token);
+    try {
+      const response = await axios.post(`${API_URL}/login`, { email, password });
 
-    // Set axios default header for future requests
-    axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      const { user, token } = response.data;
+
+      setUser(user);
+      setToken(token);
+      localStorage.setItem('user', JSON.stringify(user));
+      localStorage.setItem('token', token);
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    } catch (error) {
+      throw error; // re-throw to handle in Login.jsx
+    }
   };
 
   const logout = () => {
