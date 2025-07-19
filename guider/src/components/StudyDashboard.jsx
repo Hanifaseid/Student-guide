@@ -6,6 +6,9 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext'; // for token
 
+// 🔗 Set your deployed backend URL here:
+const API_BASE = 'https://student-guide-backend-cb6l.onrender.com';
+
 const StudyDashboard = ({ darkMode }) => {
   const { token } = useAuth();
 
@@ -19,7 +22,7 @@ const StudyDashboard = ({ darkMode }) => {
   useEffect(() => {
     const fetchDashboard = async () => {
       try {
-        const res = await axios.get('/api/study/dashboard', {
+        const res = await axios.get(`${API_BASE}/api/study/dashboard`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setStudyLogs(res.data.sessions || []);
@@ -28,14 +31,14 @@ const StudyDashboard = ({ darkMode }) => {
         console.error('Error fetching dashboard data:', err.message);
       }
     };
-    fetchDashboard();
+    if (token) fetchDashboard();
   }, [token]);
 
   const addTask = async () => {
     if (!newTask.text || !newTask.subject) return;
     try {
       const res = await axios.post(
-        '/api/study/tasks',
+        `${API_BASE}/api/study/tasks`,
         newTask,
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -49,7 +52,7 @@ const StudyDashboard = ({ darkMode }) => {
   const toggleTask = async (id) => {
     try {
       const res = await axios.patch(
-        `/api/study/tasks/${id}/toggle`,
+        `${API_BASE}/api/study/tasks/${id}/toggle`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -64,7 +67,7 @@ const StudyDashboard = ({ darkMode }) => {
     if (!date || !subject || !duration) return;
     try {
       const res = await axios.post(
-        '/api/study/sessions',
+        `${API_BASE}/api/study/sessions`,
         { date, subject, duration: parseInt(duration) },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -74,7 +77,7 @@ const StudyDashboard = ({ darkMode }) => {
     } catch (err) {
       console.error('Failed to add session:', err.message);
     }
-  };
+  }
 
   const subjects = [...new Set(studyLogs.map((log) => log.subject))];
   const totalHours = studyLogs.reduce((sum, log) => sum + log.duration, 0) / 60;
