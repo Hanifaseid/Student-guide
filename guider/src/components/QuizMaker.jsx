@@ -1,31 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiPlus, FiX, FiChevronDown, FiCheck } from 'react-icons/fi';
+import axios from 'axios';
+import { useAuth } from '../context/AuthContext';
+
+const API_BASE = 'https://student-guide-backend-cb6l.onrender.com';
 
 const QuizMaker = ({ darkMode }) => {
-  const [quizzes, setQuizzes] = useState([
-    {
-      id: 1,
-      title: 'React Basics',
-      questions: [
-        {
-          id: 1,
-          text: 'What is React?',
-          type: 'multiple_choice',
-          options: ['A programming language', 'A JavaScript library', 'A database', 'A CSS framework'],
-          correctAnswer: 1,
-        },
-        {
-          id: 2,
-          text: 'React uses JSX for templating.',
-          type: 'true_false',
-          correctAnswer: true,
-        },
-      ],
-    },
-  ]);
-
+  const { token } = useAuth(); // get token for auth headers
+  const [quizzes, setQuizzes] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [activeQuiz, setActiveQuiz] = useState(null);
+  const [isAddingQuiz, setIsAddingQuiz] = useState(false);
+
   const [newQuiz, setNewQuiz] = useState({ title: '', questions: [] });
   const [newQuestion, setNewQuestion] = useState({
     text: '',
@@ -33,97 +20,109 @@ const QuizMaker = ({ darkMode }) => {
     options: ['', ''],
     correctAnswer: 0,
   });
-  const [isAddingQuiz, setIsAddingQuiz] = useState(false);
 
-  // Handlers
-  const addQuiz = () => {
-    if (newQuiz.title) {
-      const quiz = { ...newQuiz, id: Date.now() };
-      setQuizzes([...quizzes, quiz]);
+  useEffect(() => {
+    const fetchQuizzes = async () => {
+      if (!token) return; // avoid fetching without token
+      try {
+        const res = await axios.get(`${API_BASE}/api/quizzes`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setQuizzes(res.data || []);
+      } catch (err) {
+        console.error('Error fetching quizzes:', err.response?.data?.message || err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchQuizzes();
+  }, [token]);
+
+  const addQuiz = async () => {
+    if (!newQuiz.title || newQuiz.questions.length === 0 || !token) return;
+    try {
+      const res = await axios.post(
+        `${API_BASE}/api/quizzes`,
+        {
+          title: newQuiz.title,
+          questions: newQuiz.questions,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      setQuizzes((prev) => [...prev, res.data]);
       setNewQuiz({ title: '', questions: [] });
       setIsAddingQuiz(false);
+    } catch (err) {
+      console.error('Error creating quiz:', err.response?.data?.message || err.message);
     }
   };
 
   const addQuestion = () => {
-    if (
-      newQuestion.text &&
-      (newQuestion.type === 'true_false' || newQuestion.options.every((opt) => opt.trim())
-    )
-    ) {
-      const question = { ...newQuestion, id: Date.now() };
-      setNewQuiz({
-        ...newQuiz,
-        questions: [...newQuiz.questions, question],
-      });
-      setNewQuestion({
-        text: '',
-        type: 'multiple_choice',
-        options: ['', ''],
-        correctAnswer: 0,
-      });
+    if (!newQuestion.text) return;
+
+    if (newQuestion.type === 'multiple_choice') {
+      const filledOptions = newQuestion.options.filter(opt => opt.trim() !== '');
+      if (filledOptions.length < 2) return;
     }
+
+    const question = {
+      ...newQuestion,
+      id: Date.now(),
+      options:
+        newQuestion.type === 'multiple_choice'
+          ? newQuestion.options.filter(opt => opt.trim() !== '')
+          : newQuestion.options,
+    };
+
+    setNewQuiz((prev) => ({ ...prev, questions: [...prev.questions, question] }));
+
+    setNewQuestion({
+      text: '',
+      type: 'multiple_choice',
+      options: ['', ''],
+      correctAnswer: 0,
+    });
   };
 
   const updateOption = (index, value) => {
-    const updatedOptions = [...newQuestion.options];
-    updatedOptions[index] = value;
-    setNewQuestion({ ...newQuestion, options: updatedOptions });
+    const options = [...newQuestion.options];
+    options[index] = value;
+    setNewQuestion({ ...newQuestion, options });
   };
 
-  const addOption = () => {
-    setNewQuestion({
-      ...newQuestion,
-      options: [...newQuestion.options, ''],
-    });
-  };
+  const addOption = () =>
+    setNewQuestion({ ...newQuestion, options: [...newQuestion.options, ''] });
 
   const removeOption = (index) => {
-    const updatedOptions = [...newQuestion.options];
-    updatedOptions.splice(index, 1);
+    const options = [...newQuestion.options];
+    options.splice(index, 1);
     setNewQuestion({
       ...newQuestion,
-      options: updatedOptions,
-      correctAnswer: Math.min(newQuestion.correctAnswer, updatedOptions.length - 1),
+      options,
+      correctAnswer: Math.min(newQuestion.correctAnswer, options.length - 1),
     });
   };
 
-  // Animation Variants
+  /* ───────────────────────────── animations ───────────────────────── */
   const containerVariants = {
     hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-        when: 'beforeChildren',
-      },
-    },
+    visible: { opacity: 1, transition: { staggerChildren: 0.1, when: 'beforeChildren' } },
   };
-
   const itemVariants = {
     hidden: { y: 20, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: {
-        type: 'spring',
-        stiffness: 100,
-        damping: 10,
-      },
-    },
+    visible: { y: 0, opacity: 1, transition: { type: 'spring', stiffness: 100, damping: 10 } },
   };
-
   const cardVariants = {
     hover: {
       y: -5,
       boxShadow: darkMode
-        ? '0 10px 25px -5px rgba(0, 0, 0, 0.5)'
-        : '0 10px 25px -5px rgba(0, 0, 0, 0.1)',
+        ? '0 10px 25px -5px rgba(0,0,0,.5)'
+        : '0 10px 25px -5px rgba(0,0,0,.1)',
       transition: { duration: 0.3 },
     },
-    tap: {
-      scale: 0.98,
-    },
+    tap: { scale: 0.98 },
   };
 
   return (
@@ -131,9 +130,11 @@ const QuizMaker = ({ darkMode }) => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
-      className={`p-4 md:p-6 rounded-xl ${darkMode ? 'bg-gray-800' : 'bg-white'} shadow-lg`}
+      className={`p-4 md:p-6 rounded-xl shadow-lg ${
+        darkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-800'
+      }`}
     >
-      {/* Title */}
+      {/* Header */}
       <motion.h2
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
@@ -143,30 +144,35 @@ const QuizMaker = ({ darkMode }) => {
         Quiz Practice
       </motion.h2>
 
-      {/* Layout Grid */}
+      {/* Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Left Column - Quiz Creation */}
+        {/* Left column: create quiz */}
         <motion.div variants={containerVariants} initial="hidden" animate="visible">
           <motion.div
             variants={itemVariants}
-            className={`p-5 rounded-xl ${darkMode ? 'bg-gray-700' : 'bg-gray-50'} mb-4 shadow-md transition-all duration-300`}
+            className={`p-5 rounded-xl mb-4 shadow-md transition-all ${
+              darkMode ? 'bg-gray-700' : 'bg-gray-50'
+            }`}
           >
+            {/* Top bar */}
             <div className="flex justify-between items-center mb-4">
               <h3 className="font-semibold text-lg">Your Quizzes</h3>
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                onClick={() => setIsAddingQuiz(!isAddingQuiz)}
-                className={`flex items-center gap-2 px-3 py-1.5 rounded-lg ${
-                  darkMode ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'
-                } text-white text-sm`}
+                onClick={() => setIsAddingQuiz((s) => !s)}
+                className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm ${
+                  darkMode
+                    ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                    : 'bg-blue-500 hover:bg-blue-600 text-white'
+                }`}
               >
                 <FiPlus size={16} />
                 New Quiz
               </motion.button>
             </div>
 
-            {/* Add Quiz Form */}
+            {/* Form (collapsible) */}
             <AnimatePresence>
               {isAddingQuiz && (
                 <motion.div
@@ -176,259 +182,248 @@ const QuizMaker = ({ darkMode }) => {
                   transition={{ duration: 0.3 }}
                   className="overflow-hidden"
                 >
-                  <div className="space-y-4 pt-2">
-                    {/* Quiz Title */}
+                  {/* Quiz title */}
+                  <motion.input
+                    type="text"
+                    value={newQuiz.title}
+                    onChange={(e) => setNewQuiz({ ...newQuiz, title: e.target.value })}
+                    placeholder="Quiz title"
+                    className={`w-full p-3 rounded-lg mb-4 focus:ring-2 focus:ring-blue-500 outline-none ${
+                      darkMode
+                        ? 'bg-gray-600 placeholder-gray-400 text-white'
+                        : 'bg-white placeholder-gray-500'
+                    }`}
+                  />
+
+                  {/* Question builder */}
+                  <motion.div
+                    className={`p-4 rounded-lg shadow-inner ${
+                      darkMode ? 'bg-gray-600' : 'bg-white'
+                    }`}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.2 }}
+                  >
+                    <h4 className="font-semibold mb-3 flex items-center gap-2">
+                      <FiPlus size={18} /> Add Question
+                    </h4>
+
+                    {/* Question text */}
                     <motion.input
                       type="text"
-                      value={newQuiz.title}
-                      onChange={(e) => setNewQuiz({ ...newQuiz, title: e.target.value })}
-                      placeholder="Quiz title"
-                      className={`w-full p-3 rounded-lg ${
-                        darkMode ? 'bg-gray-600 text-white placeholder-gray-400' : 'bg-white placeholder-gray-500'
-                      } focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all`}
-                      whileFocus={{ scale: 1.01 }}
+                      value={newQuestion.text}
+                      onChange={(e) =>
+                        setNewQuestion({ ...newQuestion, text: e.target.value })
+                      }
+                      placeholder="Question text"
+                      className={`w-full p-3 rounded-lg mb-4 focus:ring-2 focus:ring-blue-500 outline-none ${
+                        darkMode
+                          ? 'bg-gray-500 placeholder-gray-400 text-white'
+                          : 'bg-gray-100 placeholder-gray-500'
+                      }`}
                     />
 
-                    {/* Question Form */}
-                    <motion.div
-                      className={`p-4 rounded-lg ${
-                        darkMode ? 'bg-gray-600' : 'bg-white'
-                      } shadow-inner`}
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ delay: 0.2 }}
-                    >
-                      <h4 className="font-semibold mb-3 flex items-center gap-2">
-                        <FiPlus size={18} />
-                        Add Question
-                      </h4>
-                      <div className="space-y-4">
-                        {/* Question Text */}
-                        <motion.input
-                          type="text"
-                          value={newQuestion.text}
-                          onChange={(e) =>
-                            setNewQuestion({ ...newQuestion, text: e.target.value })
-                          }
-                          placeholder="Question text"
-                          className={`w-full p-3 rounded-lg ${
-                            darkMode
-                              ? 'bg-gray-500 text-white placeholder-gray-400'
-                              : 'bg-gray-100 placeholder-gray-500'
-                          } focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all`}
-                          whileFocus={{ scale: 1.01 }}
-                        />
+                    {/* Type selector */}
+                    <motion.div className="relative mb-4">
+                    <select
+  value={newQuestion.type}
+  onChange={(e) => {
+    const type = e.target.value;
+    setNewQuestion({
+      text: '',
+      type,
+      options: type === 'multiple_choice' ? ['', ''] : [],
+      correctAnswer: 0,
+    });
+  }}
+  className={`w-full p-3 pr-8 rounded-lg appearance-none focus:ring-2 focus:ring-blue-500 outline-none ${
+    darkMode ? 'bg-gray-500 text-white' : 'bg-gray-100'
+  }`}
+>
+  <option value="multiple_choice">Multiple Choice</option>
+  <option value="true_false">True / False</option>
+</select>
 
-                        {/* Question Type Selector */}
-                        <motion.div className="relative" whileHover={{ scale: 1.01 }}>
-                          <select
-                            value={newQuestion.type}
-                            onChange={(e) =>
-                              setNewQuestion({
-                                ...newQuestion,
-                                type: e.target.value,
-                                options:
-                                  e.target.value === 'multiple_choice'
-                                    ? ['', '']
-                                    : [],
-                                correctAnswer: 0,
-                              })
-                            }
-                            className={`w-full p-3 rounded-lg appearance-none ${
-                              darkMode ? 'bg-gray-500 text-white' : 'bg-gray-100'
-                            } focus:ring-2 focus:ring-blue-500 focus:outline-none pr-8`}
-                          >
-                            <option value="multiple_choice">Multiple Choice</option>
-                            <option value="true_false">True/False</option>
-                          </select>
-                          <FiChevronDown
-                            className={`absolute right-3 top-1/2 transform -translate-y-1/2 ${
-                              darkMode ? 'text-gray-300' : 'text-gray-500'
-                            }`}
-                          />
-                        </motion.div>
-
-                        {/* Multiple Choice Options */}
-                        {newQuestion.type === 'multiple_choice' && (
-                          <motion.div className="space-y-3" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-                            {newQuestion.options.map((option, index) => (
-                              <motion.div key={index} className="flex items-center gap-2" variants={itemVariants}>
-                                <motion.button
-                                  type="button"
-                                  onClick={() => setNewQuestion({ ...newQuestion, correctAnswer: index })}
-                                  className={`flex-shrink-0 w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                                    darkMode ? 'border-gray-400' : 'border-gray-500'
-                                  } ${
-                                    newQuestion.correctAnswer === index
-                                      ? darkMode
-                                        ? 'bg-blue-500 border-blue-500'
-                                        : 'bg-blue-400 border-blue-400'
-                                      : ''
-                                  }`}
-                                  whileHover={{ scale: 1.1 }}
-                                  whileTap={{ scale: 0.9 }}
-                                >
-                                  {newQuestion.correctAnswer === index && <FiCheck size={12} className="text-white" />}
-                                </motion.button>
-                                <motion.input
-                                  type="text"
-                                  value={option}
-                                  onChange={(e) => updateOption(index, e.target.value)}
-                                  placeholder={`Option ${index + 1}`}
-                                  className={`flex-1 p-2 rounded-lg ${
-                                    darkMode
-                                      ? 'bg-gray-500 text-white placeholder-gray-400'
-                                      : 'bg-gray-100 placeholder-gray-500'
-                                  } focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all`}
-                                  whileFocus={{ scale: 1.01 }}
-                                />
-                                {newQuestion.options.length > 2 && (
-                                  <motion.button
-                                    onClick={() => removeOption(index)}
-                                    className="ml-1 text-red-500 p-1 rounded-full hover:bg-red-500/10"
-                                    whileHover={{ scale: 1.2 }}
-                                    whileTap={{ scale: 0.9 }}
-                                  >
-                                    <FiX size={16} />
-                                  </motion.button>
-                                )}
-                              </motion.div>
-                            ))}
-
-                            {/* Add Option Button */}
-                            <motion.button
-                              onClick={addOption}
-                              className={`flex items-center gap-1 text-sm px-3 py-1.5 rounded-lg ${
-                                darkMode ? 'bg-gray-500 hover:bg-gray-400 text-white' : 'bg-gray-200 hover:bg-gray-300'
-                              } transition-colors`}
-                              whileHover={{ y: -1 }}
-                              whileTap={{ scale: 0.95 }}
-                            >
-                              <FiPlus size={14} />
-                              Add Option
-                            </motion.button>
-                          </motion.div>
-                        )}
-
-                        {/* True/False Toggle */}
-                        {newQuestion.type === 'true_false' && (
-                          <motion.div
-                            className="flex gap-4"
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{ duration: 0.3 }}
-                          >
-                            {[true, false].map((value) => (
-                              <motion.label
-                                key={value.toString()}
-                                className={`flex items-center gap-2 px-4 py-2 rounded-lg cursor-pointer ${
-                                  darkMode ? 'hover:bg-gray-500' : 'hover:bg-gray-200'
-                                } transition-colors ${
-                                  newQuestion.correctAnswer === value
-                                    ? darkMode
-                                      ? 'bg-blue-600'
-                                      : 'bg-blue-400 text-white'
-                                    : ''
-                                }`}
-                                whileHover={{ scale: 1.03 }}
-                                whileTap={{ scale: 0.97 }}
-                              >
-                                <input
-                                  type="radio"
-                                  name="trueFalse"
-                                  checked={newQuestion.correctAnswer === value}
-                                  onChange={() =>
-                                    setNewQuestion({ ...newQuestion, correctAnswer: value })
-                                  }
-                                  className="hidden"
-                                />
-                                <div
-                                  className={`w-4 h-4 rounded-full border flex items-center justify-center ${
-                                    darkMode ? 'border-gray-300' : 'border-gray-500'
-                                  } ${
-                                    newQuestion.correctAnswer === value
-                                      ? darkMode
-                                        ? 'bg-blue-500 border-blue-500'
-                                        : 'bg-blue-400 border-blue-400'
-                                      : ''
-                                  }`}
-                                >
-                                  {newQuestion.correctAnswer === value && (
-                                    <div className="w-2 h-2 rounded-full bg-white"></div>
-                                  )}
-                                </div>
-                                <span>{value ? 'True' : 'False'}</span>
-                              </motion.label>
-                            ))}
-                          </motion.div>
-                        )}
-
-                        {/* Add Question Button */}
-                        <div className="flex justify-end gap-2 pt-2">
-                          <motion.button
-                            onClick={addQuestion}
-                            disabled={
-                              !newQuestion.text ||
-                              (newQuestion.type === 'multiple_choice' &&
-                                !newQuestion.options.every((opt) => opt.trim()))
-                            }
-                            className={`flex items-center gap-2 px-4 py-2 rounded-lg ${
-                              !newQuestion.text ||
-                              (newQuestion.type === 'multiple_choice' &&
-                                !newQuestion.options.every((opt) => opt.trim()))
-                                ? darkMode
-                                  ? 'bg-gray-600 cursor-not-allowed'
-                                  : 'bg-gray-300 cursor-not-allowed'
-                                : darkMode
-                                ? 'bg-blue-600 hover:bg-blue-700'
-                                : 'bg-blue-500 hover:bg-blue-600'
-                            } text-white transition-colors`}
-                            whileHover={{
-                              scale:
-                                !newQuestion.text ||
-                                (newQuestion.type === 'multiple_choice' &&
-                                  !newQuestion.options.every((opt) => opt))
-                                  ? 1
-                                  : 1.05,
-                            }}
-                            whileTap={{ scale: 0.95 }}
-                          >
-                            <FiPlus size={16} />
-                            Add Question
-                          </motion.button>
-                        </div>
-                      </div>
+                      <FiChevronDown
+                        className={`absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none ${
+                          darkMode ? 'text-gray-300' : 'text-gray-500'
+                        }`}
+                      />
                     </motion.div>
 
-                    {/* Create Quiz Button */}
-                    <motion.div className="flex justify-end">
+                    {/* Multiple-choice options */}
+                    {newQuestion.type === 'multiple_choice' && (
+                      <motion.div className="space-y-3">
+                        {newQuestion.options.map((opt, idx) => (
+                          <motion.div
+                            key={idx}
+                            className="flex items-center gap-2"
+                            variants={itemVariants}
+                          >
+                            {/* Radio choose correct */}
+                            <motion.button
+                              type="button"
+                              onClick={() =>
+                                setNewQuestion({ ...newQuestion, correctAnswer: idx })
+                              }
+                              className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                                darkMode ? 'border-gray-400' : 'border-gray-500'
+                              } ${
+                                newQuestion.correctAnswer === idx
+                                  ? darkMode
+                                    ? 'bg-blue-500 border-blue-500'
+                                    : 'bg-blue-400 border-blue-400'
+                                  : ''
+                              }`}
+                              whileHover={{ scale: 1.1 }}
+                              whileTap={{ scale: 0.9 }}
+                            >
+                              {newQuestion.correctAnswer === idx && (
+                                <FiCheck size={12} className="text-white" />
+                              )}
+                            </motion.button>
+
+                            {/* Option text */}
+                           <motion.input
+  type="text"
+  value={opt}
+  onChange={(e) => updateOption(idx, e.target.value)}
+  placeholder={`Option ${idx + 1}`}
+  className={`flex-1 p-2 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none ${
+    darkMode
+      ? 'bg-gray-500 placeholder-gray-400 text-white'
+      : 'bg-gray-100 placeholder-gray-500'
+  }`}
+  whileFocus={{ scale: 1.01 }}
+/>
+
+
+                            {/* Remove option */}
+                            {newQuestion.options.length > 2 && (
+                              <motion.button
+                                onClick={() => removeOption(idx)}
+                                className="ml-1 text-red-500 p-1 rounded-full hover:bg-red-500/10"
+                                whileHover={{ scale: 1.2 }}
+                                whileTap={{ scale: 0.9 }}
+                              >
+                                <FiX size={16} />
+                              </motion.button>
+                            )}
+                          </motion.div>
+                        ))}
+
+                        {/* Add option */}
+                        <motion.button
+                          onClick={addOption}
+                          className={`flex items-center gap-1 text-sm px-3 py-1.5 rounded-lg ${
+                            darkMode
+                              ? 'bg-gray-500 hover:bg-gray-400 text-white'
+                              : 'bg-gray-200 hover:bg-gray-300'
+                          }`}
+                          whileHover={{ y: -1 }}
+                          whileTap={{ scale: 0.95 }}
+                        >
+                          <FiPlus size={14} />
+                          Add Option
+                        </motion.button>
+                      </motion.div>
+                    )}
+
+                    {/* True/false radio */}
+                    {newQuestion.type === 'true_false' && (
+                      <motion.div className="flex gap-4">
+                        {[true, false].map((val) => (
+                          <motion.label
+                            key={val.toString()}
+                            className={`flex items-center gap-2 px-4 py-2 rounded-lg cursor-pointer ${
+                              darkMode ? 'hover:bg-gray-500' : 'hover:bg-gray-200'
+                            } ${
+                              newQuestion.correctAnswer === val
+                                ? darkMode
+                                  ? 'bg-blue-600'
+                                  : 'bg-blue-400 text-white'
+                                : ''
+                            }`}
+                            whileHover={{ scale: 1.03 }}
+                            whileTap={{ scale: 0.97 }}
+                          >
+                            <input
+                              type="radio"
+                              name="trueFalse"
+                              checked={newQuestion.correctAnswer === val}
+                              onChange={() =>
+                                setNewQuestion({ ...newQuestion, correctAnswer: val })
+                              }
+                              className="hidden"
+                            />
+                            <div
+                              className={`w-4 h-4 rounded-full border flex items-center justify-center ${
+                                darkMode ? 'border-gray-300' : 'border-gray-500'
+                              } ${
+                                newQuestion.correctAnswer === val
+                                  ? darkMode
+                                    ? 'bg-blue-500 border-blue-500'
+                                    : 'bg-blue-400 border-blue-400'
+                                  : ''
+                              }`}
+                            >
+                              {newQuestion.correctAnswer === val && (
+                                <div className="w-2 h-2 rounded-full bg-white" />
+                              )}
+                            </div>
+                            <span>{val ? 'True' : 'False'}</span>
+                          </motion.label>
+                        ))}
+                      </motion.div>
+                    )}
+
+                    {/* Add question btn */}
+                    <div className="flex justify-end pt-4">
                       <motion.button
-                        onClick={addQuiz}
-                        disabled={!newQuiz.title || newQuiz.questions.length === 0}
-                        className={`px-5 py-2.5 rounded-lg ${
-                          !newQuiz.title || newQuiz.questions.length === 0
+                        onClick={addQuestion}
+                        disabled={
+                          !newQuestion.text ||
+                          (newQuestion.type === 'multiple_choice' &&
+                            newQuestion.options.filter(opt => opt.trim() !== '').length < 2)
+                        }
+                        className={`flex items-center gap-2 px-4 py-2 rounded-lg text-white ${
+                          !newQuestion.text ||
+                          (newQuestion.type === 'multiple_choice' &&
+                            newQuestion.options.filter(opt => opt.trim() !== '').length < 2)
                             ? darkMode
                               ? 'bg-gray-600 cursor-not-allowed'
                               : 'bg-gray-300 cursor-not-allowed'
                             : darkMode
-                            ? 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700'
-                            : 'bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600'
-                        } text-white font-medium`}
-                        whileHover={{
-                          scale:
-                            !newQuiz.title || newQuiz.questions.length === 0
-                              ? 1
-                              : 1.05,
-                          boxShadow:
-                            !newQuiz.title || newQuiz.questions.length === 0
-                              ? 'none'
-                              : '0 4px 12px rgba(59, 130, 246, 0.3)',
-                        }}
+                            ? 'bg-blue-600 hover:bg-blue-700'
+                            : 'bg-blue-500 hover:bg-blue-600'
+                        }`}
+                        whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                       >
-                        Create Quiz
+                        <FiPlus size={16} /> Add Question
                       </motion.button>
-                    </motion.div>
+                    </div>
+                  </motion.div>
+
+                  {/* Create quiz btn */}
+                  <div className="flex justify-end mt-4">
+                    <motion.button
+                      onClick={addQuiz}
+                      disabled={!newQuiz.title || newQuiz.questions.length === 0}
+                      className={`px-5 py-2.5 rounded-lg text-white font-medium ${
+                        !newQuiz.title || newQuiz.questions.length === 0
+                          ? darkMode
+                            ? 'bg-gray-600 cursor-not-allowed'
+                            : 'bg-gray-300 cursor-not-allowed'
+                          : darkMode
+                          ? 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700'
+                          : 'bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600'
+                      }`}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      Create Quiz
+                    </motion.button>
                   </div>
                 </motion.div>
               )}
@@ -436,19 +431,26 @@ const QuizMaker = ({ darkMode }) => {
           </motion.div>
         </motion.div>
 
-        {/* Right Column - Quiz List */}
+        {/* Right column: quiz list */}
         <motion.div variants={containerVariants} initial="hidden" animate="visible">
           <motion.div
             variants={itemVariants}
-            className={`p-5 rounded-xl ${darkMode ? 'bg-gray-700' : 'bg-gray-50'} shadow-md`}
+            className={`p-5 rounded-xl shadow-md ${
+              darkMode ? 'bg-gray-700' : 'bg-gray-50'
+            }`}
           >
             <h3 className="font-semibold text-lg mb-4">Available Quizzes</h3>
+
             <div className="space-y-3">
               <AnimatePresence>
-                {quizzes.length > 0 ? (
+                {loading ? (
+                  <div className="text-center py-6 text-sm text-gray-400 animate-pulse">
+                    Loading quizzes…
+                  </div>
+                ) : quizzes.length > 0 ? (
                   quizzes.map((quiz) => (
                     <motion.div
-                      key={quiz.id}
+                      key={quiz._id}
                       layout
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
@@ -457,9 +459,11 @@ const QuizMaker = ({ darkMode }) => {
                       whileHover="hover"
                       whileTap="tap"
                       variants={cardVariants}
-                      className={`p-4 rounded-lg cursor-pointer ${
-                        darkMode ? 'bg-gray-600 hover:bg-gray-550' : 'bg-white hover:bg-gray-50'
-                      } border ${darkMode ? 'border-gray-500' : 'border-gray-200'} transition-colors`}
+                      className={`p-4 rounded-lg cursor-pointer border transition-colors ${
+                        darkMode
+                          ? 'bg-gray-600 hover:bg-gray-550 border-gray-500'
+                          : 'bg-white hover:bg-gray-50 border-gray-200'
+                      }`}
                       onClick={() => setActiveQuiz(quiz)}
                     >
                       <div className="flex justify-between items-start">
@@ -474,7 +478,7 @@ const QuizMaker = ({ darkMode }) => {
                         </span>
                       </div>
 
-                      {/* Question Types Preview */}
+                      {/* Small tag preview */}
                       <div className="mt-2 flex gap-1">
                         {quiz.questions.slice(0, 3).map((q, i) => (
                           <span
@@ -505,16 +509,16 @@ const QuizMaker = ({ darkMode }) => {
                     transition={{ delay: 0.3 }}
                     className="text-center py-6"
                   >
-                    <p className={`${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                    <p className={darkMode ? 'text-gray-400' : 'text-gray-500'}>
                       No quizzes created yet
                     </p>
                     <motion.button
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                       onClick={() => setIsAddingQuiz(true)}
-                      className={`mt-3 px-4 py-2 rounded-lg ${
+                      className={`mt-3 px-4 py-2 rounded-lg text-sm text-white ${
                         darkMode ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'
-                      } text-white text-sm`}
+                      }`}
                     >
                       Create Your First Quiz
                     </motion.button>
@@ -526,7 +530,7 @@ const QuizMaker = ({ darkMode }) => {
         </motion.div>
       </div>
 
-      {/* Quiz Preview Modal */}
+      {/* Preview modal */}
       <AnimatePresence>
         {activeQuiz && (
           <motion.div
@@ -542,17 +546,23 @@ const QuizMaker = ({ darkMode }) => {
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.9, opacity: 0 }}
               transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-              className={`w-full max-w-2xl rounded-xl ${darkMode ? 'bg-gray-700' : 'bg-white'} shadow-2xl overflow-hidden`}
+              className={`w-full max-w-2xl rounded-xl shadow-2xl overflow-hidden ${
+                darkMode ? 'bg-gray-700 text-white' : 'bg-white text-gray-800'
+              }`}
               onClick={(e) => e.stopPropagation()}
             >
-              {/* Header */}
+              {/* Modal header */}
               <div
-                className={`p-5 border-b ${darkMode ? 'border-gray-600' : 'border-gray-200'} flex justify-between items-center`}
+                className={`p-5 flex justify-between items-center border-b ${
+                  darkMode ? 'border-gray-600' : 'border-gray-200'
+                }`}
               >
                 <h3 className="font-semibold text-xl">{activeQuiz.title}</h3>
                 <motion.button
                   onClick={() => setActiveQuiz(null)}
-                  className={`p-1.5 rounded-full ${darkMode ? 'hover:bg-gray-600' : 'hover:bg-gray-200'} transition-colors`}
+                  className={`p-1.5 rounded-full transition-colors ${
+                    darkMode ? 'hover:bg-gray-600' : 'hover:bg-gray-200'
+                  }`}
                   whileHover={{ rotate: 90, scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
                 >
@@ -560,98 +570,93 @@ const QuizMaker = ({ darkMode }) => {
                 </motion.button>
               </div>
 
-              {/* Questions List */}
+              {/* Questions */}
               <div className="max-h-[70vh] overflow-y-auto p-5">
-                <motion.div
-                  className="space-y-4"
-                  initial="hidden"
-                  animate="visible"
-                  variants={containerVariants}
-                >
-                  {activeQuiz.questions.map((question, qIndex) => (
+                <motion.div variants={containerVariants} initial="hidden" animate="visible">
+                  {activeQuiz.questions.map((q, idx) => (
                     <motion.div
-                      key={question.id}
+                      key={idx}
                       variants={itemVariants}
-                      className={`p-4 rounded-lg ${
+                      className={`p-4 rounded-lg shadow-sm mb-3 ${
                         darkMode ? 'bg-gray-600' : 'bg-gray-50'
-                      } shadow-sm`}
+                      }`}
                     >
-                      <p className="font-medium flex items-start gap-2">
+                      <p className="font-medium flex items-start gap-2 mb-2">
                         <span
                           className={`inline-flex items-center justify-center w-6 h-6 rounded-full text-sm ${
                             darkMode ? 'bg-gray-500 text-white' : 'bg-blue-100 text-blue-800'
                           }`}
                         >
-                          {qIndex + 1}
+                          {idx + 1}
                         </span>
-                        {question.text}
+                        {q.text}
                       </p>
 
-                      {/* Multiple Choice Answers */}
-                      {question.type === 'multiple_choice' && (
-                        <div className="mt-3 space-y-2">
-                          {question.options.map((option, oIndex) => (
+                      {q.type === 'multiple_choice' ? (
+                        <div className="space-y-2">
+                          {q.options.map((opt, oIdx) => (
                             <div
-                              key={oIndex}
-                              className={`flex items-center gap-3 p-2 rounded-lg ${
+                              key={oIdx}
+                              className={`flex items-center gap-3 p-2 rounded-lg transition-colors ${
                                 darkMode ? 'hover:bg-gray-500' : 'hover:bg-gray-100'
                               } ${
-                                question.correctAnswer === oIndex
+                                q.correctAnswer === oIdx
                                   ? darkMode
                                     ? 'bg-green-900/30 border border-green-500'
                                     : 'bg-green-100 border border-green-300'
                                   : ''
-                              } transition-colors`}
+                              }`}
                             >
                               <div
-                                className={`flex-shrink-0 w-5 h-5 rounded-full border flex items-center justify-center ${
+                                className={`w-5 h-5 rounded-full border flex items-center justify-center ${
                                   darkMode ? 'border-gray-400' : 'border-gray-500'
                                 } ${
-                                  question.correctAnswer === oIndex
+                                  q.correctAnswer === oIdx
                                     ? darkMode
                                       ? 'bg-green-500 border-green-500'
                                       : 'bg-green-400 border-green-400'
                                     : ''
                                 }`}
                               >
-                                {question.correctAnswer === oIndex && <FiCheck size={12} className="text-white" />}
+                                {q.correctAnswer === oIdx && (
+                                  <FiCheck size={12} className="text-white" />
+                                )}
                               </div>
-                              <span>{option}</span>
+                              <span>{opt}</span>
                             </div>
                           ))}
                         </div>
-                      )}
-
-                      {/* True/False Answers */}
-                      {question.type === 'true_false' && (
-                        <div className="mt-3 space-y-2">
-                          {[true, false].map((value) => (
+                      ) : (
+                        <div className="space-y-2">
+                          {[true, false].map((val) => (
                             <div
-                              key={value.toString()}
-                              className={`flex items-center gap-3 p-2 rounded-lg ${
+                              key={val.toString()}
+                              className={`flex items-center gap-3 p-2 rounded-lg transition-colors ${
                                 darkMode ? 'hover:bg-gray-500' : 'hover:bg-gray-100'
                               } ${
-                                question.correctAnswer === value
+                                q.correctAnswer === val
                                   ? darkMode
                                     ? 'bg-green-900/30 border border-green-500'
                                     : 'bg-green-100 border border-green-300'
                                   : ''
-                              } transition-colors`}
+                              }`}
                             >
                               <div
-                                className={`flex-shrink-0 w-5 h-5 rounded-full border flex items-center justify-center ${
+                                className={`w-5 h-5 rounded-full border flex items-center justify-center ${
                                   darkMode ? 'border-gray-400' : 'border-gray-500'
                                 } ${
-                                  question.correctAnswer === value
+                                  q.correctAnswer === val
                                     ? darkMode
                                       ? 'bg-green-500 border-green-500'
                                       : 'bg-green-400 border-green-400'
                                     : ''
                                 }`}
                               >
-                                {question.correctAnswer === value && <FiCheck size={12} className="text-white" />}
+                                {q.correctAnswer === val && (
+                                  <FiCheck size={12} className="text-white" />
+                                )}
                               </div>
-                              <span>{value ? 'True' : 'False'}</span>
+                              <span>{val ? 'True' : 'False'}</span>
                             </div>
                           ))}
                         </div>
@@ -661,15 +666,17 @@ const QuizMaker = ({ darkMode }) => {
                 </motion.div>
               </div>
 
-              {/* Footer */}
+              {/* Modal footer */}
               <div
-                className={`p-4 border-t ${darkMode ? 'border-gray-600' : 'border-gray-200'} flex justify-end`}
+                className={`p-4 flex justify-end border-t ${
+                  darkMode ? 'border-gray-600' : 'border-gray-200'
+                }`}
               >
                 <motion.button
                   onClick={() => setActiveQuiz(null)}
-                  className={`px-5 py-2 rounded-lg ${
+                  className={`px-5 py-2 rounded-lg transition-colors ${
                     darkMode ? 'bg-gray-600 hover:bg-gray-500' : 'bg-gray-200 hover:bg-gray-300'
-                  } transition-colors`}
+                  }`}
                   whileHover={{ scale: 1.03 }}
                   whileTap={{ scale: 0.95 }}
                 >

@@ -2,9 +2,12 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 
-
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [ tailwindcss(),
-             react()],
+  plugins: [tailwindcss(), react()],
+  server: {
+    proxy: {
+      '/api': 'https://student-guide-backend-cb6l.onrender.com',  // <-- Add this proxy to forward API requests to backend
+    },
+  },
 })
